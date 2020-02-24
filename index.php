@@ -46,6 +46,73 @@
                </form>
            </div>
        </nav>
+
+       <div class="container">
+       <h5>Setup Migration</h5>
+       <hr>
+       <div class="row">
+           <div class="col-md-6">
+           <div class="card">
+               <div class="card-body">
+               <br>
+                   <h5 class="card-title">SETUP NMRS CONNECTION</h5><hr>
+                   <p class="card-text">Connection Settings</p>
+                   <form action="" method="post">
+
+                   <div class="row">
+                       <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="servername">Server Name</label>
+                                <input id="servername" class="form-control" type="text" name="servername" value="localhost">
+                            </div>
+                       </div>
+                       <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="servername">Database Name</label>
+                                <input id="servername" class="form-control" type="text" name="database" value="openmrs">
+                            </div>
+                       </div>
+                       <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="servername">Enter Username</label>
+                                <input id="servername" class="form-control" type="text" name="username" value="openmrs">
+                            </div>
+                       </div>
+                       <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="servername">Enter Password</label>
+                                <input id="servername" class="form-control" type="text" name="password">
+                            </div>
+                       </div>
+                       <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="servername">MySQL Port</label>
+                                <input id="servername" class="form-control" type="number" name="portno" value="3316">
+                            </div>
+                       </div>
+                       <div class="col-md-6">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Connect</button>
+                            </div>
+                       </div>
+                   </div>
+                   
+                   </form>
+               </div>
+           </div>
+           </div>
+
+           <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Title</h5>
+                        <p class="card-text">Content</p>
+                    </div>
+                </div>
+           </div>
+       </div>
+           
+       </div>
         
 
         <!-- jQuery -->
