@@ -1,11 +1,11 @@
-<php // require 'controllers/mainController.php'; ?>
+<?php require 'controllers/mainController.php';  ?>
 <!DOCTYPE html>
 <html lang="">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>SEED CARE TO NMRS MIGRATION</title>
+        <title>Seedscare TO NMRS Migration</title>
 
         <!-- Bootstrap CSS -->
         <link href="assets/css/bootstrap.min.css" rel="stylesheet">
@@ -18,6 +18,7 @@
         <![endif]-->
     </head>
     <body>
+    
        <nav class="navbar navbar-expand-md navbar-light bg-light">
            <a class="navbar-brand" href="#">SEEDCARE2NMRS</a>
            <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
@@ -46,8 +47,8 @@
                </form>
            </div>
        </nav>
-
-       <div class="container">
+      
+       <div class="container"> 
        <h5>Setup Migration</h5>
        <hr>
        <div class="row">
@@ -57,6 +58,7 @@
                <br>
                    <h5 class="card-title">SETUP NMRS CONNECTION</h5><hr>
                    <p class="card-text">Connection Settings</p>
+              
                    <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" id="nmrsConnectForm">
                     
                    <div class="row">
@@ -106,11 +108,17 @@
            <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                    
+                        <?php 
+                        if(isset($_POST['connect'])){?>
                         <h5 class="card-title">Select CSV File to Upload</h5>
                         <p class="card-text">
                             <form action="controllers/mainController.php" method="post" enctype="multipart/form-data">
-                            <?php checkConnection(); ?>
+                            <?php    
+                                                    
+                            $checkDB = new seedcareToNMRS();
+                            $checkDB->checkConnection(); 
+                            
+                            ?>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
@@ -136,11 +144,19 @@
                                 <div class="input-row">
                                     <div class="form-group">
                                         <label class="col-md-12 control-label"></label>
-                                        <button type="submit" class="btn btn-primary float-right">Migrate to NMRS</button>
+                                        <input type="submit" class="btn btn-primary float-right" name="MigrateData" value="Migrate to NMRS">
                                     </div>
                                 </div>
                             </form>
                         </p>
+                        <?php }else{?>
+                            
+                            <div class="alert alert-info">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                <strong>Attention!</strong> Setup NMRS Server connection and click on Connect.
+                            </div>
+                            
+                        <?php } ?>
                     </div>
                 </div>
            </div>
