@@ -109,13 +109,15 @@
                 <div class="card">
                     <div class="card-body">
                         <?php 
+                        // Check whether user clicked the connect button
                         if(isset($_POST['connect'])){?>
                         <h5 class="card-title">Select CSV File to Upload</h5>
                         <p class="card-text">
-                            <form action="controllers/mainController.php" method="post" enctype="multipart/form-data">
+                            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
                             <?php    
-                                                    
+                            // Create a new Instance of the main Class seecareToNMRS                        
                             $checkDB = new seedcareToNMRS();
+                            // Call the database checking function
                             $checkDB->checkConnection(); 
                             
                             ?>
@@ -149,7 +151,17 @@
                                 </div>
                             </form>
                         </p>
-                        <?php }else{?>
+                        <?php 
+                            // Check whether user clicked the connect button    
+                            } else if(isset($_POST['MigrateData'])){ 
+                                
+                                // Create Instance of the mainClass
+                                $uploadCSV = new seedcareToNMRS();
+
+                                // Call the uploadCSV method/function
+                                $uploadCSV->uploadCSV(); 
+                            }else{
+                        ?>
                             
                             <div class="alert alert-info">
                                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>

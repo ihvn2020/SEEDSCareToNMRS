@@ -1,6 +1,7 @@
 <?php
 
 require 'config/database.php';
+require 'model/patientModel.php';
 //get connection parameters
 // require 'config/database.php';
 
@@ -23,7 +24,7 @@ class seedcareToNMRS {
 		
 		$data = trim($data);
 		$data = stripslashes($data);
-		// $data = mysql_real_escape_string($conn,$data);
+		// $data = real_escape_string($conn,$data);
 		$data = htmlspecialchars($data);
 		return $data;
 	}
@@ -61,30 +62,41 @@ class seedcareToNMRS {
 		
 	}
 
-	/*
-	if (isset($_POST["import"])) {
-		
-		$fileName = $_FILES["file"]["tmp_name"]; 	
-		
-		if ($_FILES["file"]["size"] > 0) {
+	public function uploadCSV()
+	{
+		// CSV File Upload
+		if(isset($_POST["MigrateData"])){
 			
-			$file = fopen($fileName, "r");
+			$fileName = $_FILES["file"]["tmp_name"]; 	
 			
-			while (($column = fgetcsv($file, 10000, ",")) !== FALSE) {
-				$sqlInsert = "INSERT into users (userId,userName,password,firstName,lastName)
-					values ('" . $column[0] . "','" . $column[1] . "','" . $column[2] . "','" . $column[3] . "','" . $column[4] . "')";
-				$result = mysqli_query($conn, $sqlInsert);
+			if ($_FILES["file"]["size"] > 0) {
 				
-				if (! empty($result)) {
-					$type = "success";
-					$message = "CSV Data Imported into the Database";
-				} else {
-					$type = "error";
-					$message = "Problem in Importing CSV Data";
+				$file = fopen($fileName, "r");
+				
+				while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
+
+					$columns = implode(", ",array_keys(patientFields($csvColumn)));
+					$escaped_values = array_map('real_escape_string', array_values(patientFields()));
+					$values  = implode(",", $escaped_values);
+					$patientSQL = "INSERT INTO `patient`($columns) VALUES ($values)";
+
+					/* $sqlInsert = "INSERT into patient (userId,userName,password,firstName,lastName)
+						values ('" . $column[0] . "','" . $column[1] . "','" . $column[2] . "','" . $column[3] . "','" . $column[4] . "')";
+					*/
+						$result = mysqli_query($conn, $patientSQL);
+					
+					if (! empty($result)) {
+						$type = "success";
+						$message = "Patients' CSV Data Imported into the Database";
+					} else {
+						$type = "error";
+						$message = "Problem in Importing CSV Data";
+					}
 				}
 			}
 		}
+		
 	}
-	*/
+	
  
 }
