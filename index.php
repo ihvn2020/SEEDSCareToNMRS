@@ -1,11 +1,11 @@
-<php // require 'controllers/seedcareToNMRS.php'; ?>
+<php // require 'controllers/mainController.php'; ?>
 <!DOCTYPE html>
 <html lang="">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Title Page</title>
+        <title>SEED CARE TO NMRS MIGRATION</title>
 
         <!-- Bootstrap CSS -->
         <link href="assets/css/bootstrap.min.css" rel="stylesheet">
@@ -57,8 +57,8 @@
                <br>
                    <h5 class="card-title">SETUP NMRS CONNECTION</h5><hr>
                    <p class="card-text">Connection Settings</p>
-                   <form action="" method="post">
-
+                   <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" id="nmrsConnectForm">
+                    
                    <div class="row">
                        <div class="col-md-6">
                             <div class="form-group">
@@ -68,31 +68,32 @@
                        </div>
                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="servername">Database Name</label>
-                                <input id="servername" class="form-control" type="text" name="database" value="openmrs">
+                                <label for="database">Database Name</label>
+                                <input id="database" class="form-control" type="text" name="database" value="openmrs">
                             </div>
                        </div>
                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="servername">Enter Username</label>
-                                <input id="servername" class="form-control" type="text" name="username" value="openmrs">
+                                <label for="username">Enter Username</label>
+                                <input id="username" class="form-control" type="text" name="username" value="openmrs">
                             </div>
                        </div>
                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="servername">Enter Password</label>
-                                <input id="servername" class="form-control" type="text" name="password">
+                                <label for="password">Enter Password</label>
+                                <input id="password" class="form-control" type="text" name="password" value="ck9RdGyz&jXR">
                             </div>
                        </div>
                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="servername">MySQL Port</label>
-                                <input id="servername" class="form-control" type="number" name="portno" value="3316">
+                                <label for="port_no">MySQL Port</label>
+                                <input id="port_no" class="form-control" type="number" name="port_no" value="3316">
                             </div>
                        </div>
                        <div class="col-md-6">
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary">Connect</button>
+                            <label for="connect"><small>Click &darr; Here to Connect</small></label>
+                                <input name="connect" id="connect" type="submit" class="btn btn-primary" value='Connect to NMRS'>
                             </div>
                        </div>
                    </div>
@@ -105,8 +106,41 @@
            <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Title</h5>
-                        <p class="card-text">Content</p>
+                    
+                        <h5 class="card-title">Select CSV File to Upload</h5>
+                        <p class="card-text">
+                            <form action="controllers/mainController.php" method="post" enctype="multipart/form-data">
+                            <?php checkConnection(); ?>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="data_category">Select Data Category</label>
+                                            <select name="data_category" id="data_category" class="form-control">
+                                                <option value="Demographics">Demographics Data</option>
+                                                <option value="Clinical">Clinical Data</option>
+                                                <option value="Users">Users Data</option>
+                                                <option value="Lab">Laboratory Data</option>
+                                                <option value="All">All Data</option>
+                                            </select>
+                                        </div>                            
+                                    </div>
+                                </div>
+
+                                <div class="input-row">
+                                    <div class="form-group">
+                                        <label class="col-md-12 control-label">Upload CSV File</label>
+                                        <input type="file" name="file" id="file" accept=".csv">
+                                    </div>
+                                </div>
+
+                                <div class="input-row">
+                                    <div class="form-group">
+                                        <label class="col-md-12 control-label"></label>
+                                        <button type="submit" class="btn btn-primary float-right">Migrate to NMRS</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </p>
                     </div>
                 </div>
            </div>
