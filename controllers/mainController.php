@@ -51,7 +51,6 @@ class seedcareToNMRS {
 				echo "<input type='hidden' name='username' value='$username'>";
 				echo "<input type='hidden' name='password' value='$password'>";
 				echo "<input type='hidden' name='db' value='$db'>";
-				echo "<input type='hidden' name='port_no' value='$port_no'>";
 
 				echo "<h3 class='alert alert-success' style='text-align: center;'>You are Connected to the <b>$db</b> Database </h3>";	
 			}else{
@@ -64,39 +63,67 @@ class seedcareToNMRS {
 
 	public function uploadCSV()
 	{
-		// CSV File Upload
-		if(isset($_POST["MigrateData"])){
-			
-			$fileName = $_FILES["file"]["tmp_name"]; 	
-			
-			if ($_FILES["file"]["size"] > 0) {
+		$conn = connectDB($_POST['servername'],$_POST['username'],$_POST['password'],$_POST['db']);
+			// CSV File Upload
+			if(isset($_POST["MigrateData"])){
+				$fileName = $_FILES["file"]["tmp_name"]; 
+				mysqli_query($conn,"SET FOREIGN_KEY_CHECKS = 0");
+				mysqli_query($conn,"TRUNCATE patient") or die(mysqli_error($conn));
 				
-				$file = fopen($fileName, "r");
-				
-				while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
-
-					$columns = implode(", ",array_keys(patientFields($csvColumn)));
-					$escaped_values = array_map('real_escape_string', array_values(patientFields()));
-					$values  = implode(",", $escaped_values);
-					$patientSQL = "INSERT INTO `patient`($columns) VALUES ($values)";
-
-					/* $sqlInsert = "INSERT into patient (userId,userName,password,firstName,lastName)
-						values ('" . $column[0] . "','" . $column[1] . "','" . $column[2] . "','" . $column[3] . "','" . $column[4] . "')";
-					*/
-						$result = mysqli_query($conn, $patientSQL);
+				if ($_FILES["file"]["size"] > 0) {
 					
-					if (! empty($result)) {
-						$type = "success";
-						$message = "Patients' CSV Data Imported into the Database";
-					} else {
-						$type = "error";
-						$message = "Problem in Importing CSV Data";
+					$file = fopen($fileName, "r");
+					$all_values = "";
+					$row = 1;
+					
+					while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
+						$num = count($csvColumn);
+						if($row == 1){ $row++; continue; }
+						echo "Migrating Patient". $csvColumn[0];
+						echo $columns = implode(", ",nmrsFields());
+						//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+						echo $values  = implode(",", seedcareFields($csvColumn));
+						// $all_values.= "(".$values."),";
+						$patientSQL = "INSERT INTO `patient`($columns) VALUES ($values) ON DUPLICATE KEY UPDATE patient_id=+patient_id;";
+
+						//$sqlInsert = "INSERT into patient (userId,userName,password,firstName,lastName)
+						//	values ('" . $column[0] . "','" . $column[1] . "','" . $column[2] . "','" . $column[3] . "','" . $column[4] . "')";
+						
+							$result = mysqli_query($conn, $patientSQL) or die(mysqli_error($conn));
+						
+						if (! empty($result)) {
+							$type = "success";
+							$message = "Patients' CSV Data Imported into the Database";
+						} else {
+							$type = "error";
+							$message = "Problem in Importing CSV Data";
+						}
+						$row++;
 					}
+					
 				}
+				
+				
+				
+				mysqli_query($conn,"SET FOREIGN_KEY_CHECKS = 1");
+
 			}
-		}
+		
 		
 	}
 	
  
 }
+
+/*
+$query = <<<eof
+    LOAD DATA INFILE '$fileName'
+     INTO TABLE tableName
+     FIELDS TERMINATED BY '|' OPTIONALLY ENCLOSED BY '"'
+     LINES TERMINATED BY '\n'
+    (field1,field2,field3,etc)
+eof;
+
+$db->query($query);
+*/
+?>

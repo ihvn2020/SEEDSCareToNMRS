@@ -1,8 +1,8 @@
 <?php
 
 // Mapping patient tables columns/fields to Demographics' table CSV
-function patientFields($csvColumn){
-    $patientColumns = array(
+function mappedFields($csvColumn){
+    $nmrsColumns = array(
         'patient_id'=>$csvColumn[0], // Ptn_Pk
         'creator'=>$csvColumn[23], // UserID
         'date_created'=>$csvColumn[24], // CreateDate
@@ -14,7 +14,43 @@ function patientFields($csvColumn){
         'allergy_status'=>$csvColumn[18]
     );
 
-    return $patientColumns;
+    return $nmrsColumns;
+        
+}
+
+// Column names in NMRS Patient Table
+function nmrsFields(){
+    $nmrsColumns = array(
+        'patient_id', // Ptn_Pk
+        'creator', // UserID
+        'date_created', // CreateDate
+        'changed_by', // UserID
+        'date_changed', // UpdateDate
+        'voided', // Delete Flag
+        'voided_by', // UserID
+        'void_reason',
+        'allergy_status'
+    );
+
+    return $nmrsColumns;
+        
+}
+
+//Column Names in Seed Care
+function seedcareFields($csvColumn){
+    $seedcareColumns = array(
+        $csvColumn[0], // Ptn_Pk
+        1, //$csvColumn[23], // UserID We use one for now because the demographics table has no creator value
+        $csvColumn[24], // CreateDate
+        $csvColumn[23], // UserID
+        $csvColumn[25], // UpdateDate
+        $csvColumn[22], // Delete Flag
+        $csvColumn[23], // UserID
+        $csvColumn[21], // Notes
+        "'".$csvColumn[18]."'" // Status
+    );
+
+    return $seedcareColumns;
         
 }
 
