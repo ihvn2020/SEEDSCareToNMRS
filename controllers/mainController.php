@@ -2,6 +2,10 @@
 
 require 'config/database.php';
 require 'model/patientModel.php';
+require 'model/patient_identifierModel.php';
+require 'model/personModel.php';
+require 'model/person_nameModel.php';
+require 'model/person_addressModel.php';
 //get connection parameters
 // require 'config/database.php';
 
@@ -111,26 +115,41 @@ class seedcareToNMRS {
 								// Progress Bar Code may be changed to Javascript
 							//sleep(1);
 						  }
-						$demographicsTables = array('patient','patient_identifier','person','person_name','person_address');
-						  // Get Columns from the arrays stored in each functions
-						$columns = implode(", ",nmrspatientFields());
+						  
+						  // List of Tables to update with data from the demographics CSV
+						  $demographicsTables = array('patient','patient_identifier','person','person_name','person_address');
+						
+						  foreach ($demographicsTable as $key => $dtable) {
 
-						//$escaped_values = implode(',', (seedcareFields($csvColumn)));
-						$values  = implode(",", seedcarepatientFields($csvColumn));			
+							$nmrs_fields = 'nmrs'.$dtable.'Fields';
+							$seedcare_fields = 'seedcare'.$dtable.'Fields('.$csvColumn.')';
+
+							// Get Columns from the arrays stored in each functions
+							$columns = implode(", ",$nmrs_fields);
+
+							//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+							$values  = implode(",", $seedcare_fields);
+
+							if($row<$num){
+								$all_values.= "(".$values."),";
+							}else{
+	
+								// If the Last row is reach then write the sql
+								$all_values.= "(".$values.")";
+								$demographicsSQL = "INSERT INTO `$dtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+	
+								// Execute the MySQLI Query
+								$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
+							}
+
+						  }
+						
+
+									
 						
 						// Check if we have reached the last row (because it helps to right just one insert query)
 						// if not continue building up data to be uploaded once (helps to optimise)
-						if($row<$num){
-							$all_values.= "(".$values."),";
-						}else{
-
-							// If the Lat row then write the sql
-							$all_values.= "(".$values.")";
-							$patientSQL = "INSERT INTO `patient`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE patient_id=+patient_id;";
-
-							// Execute the MySQLI Query
-							$result = mysqli_query($conn, $patientSQL) or die(mysqli_error($conn));
-						}
+						
 						
 						if (! empty($result)) {
 							echo "<div class='success'>Patients\' CSV Data Imported into the Database</div>";

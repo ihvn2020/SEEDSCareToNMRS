@@ -28,8 +28,8 @@ function nmrspatientFields(){
         'date_changed', // UpdateDate
         'voided', // Delete Flag
         'voided_by', // UserID
-        'void_reason',
-        'allergy_status'
+        'void_reason', // Null
+        'allergy_status' // 
     );
 
     return $nmrspatientColumns;
