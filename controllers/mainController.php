@@ -121,26 +121,27 @@ class seedcareToNMRS {
 						
 						  foreach ($demographicsTable as $key => $dtable) {
 
-							$nmrs_fields = 'nmrs'.$dtable.'Fields';
-							$seedcare_fields = 'seedcare'.$dtable.'Fields('.$csvColumn.')';
+							if($dtable=='patient_identifier' )
+								$nmrs_fields = 'nmrs'.$dtable.'Fields';
+								$seedcare_fields = 'seedcare'.$dtable.'Fields('.$csvColumn.')';
 
-							// Get Columns from the arrays stored in each functions
-							$columns = implode(", ",$nmrs_fields);
+								// Get Columns from the arrays stored in each functions
+								$columns = implode(", ",$nmrs_fields);
 
-							//$escaped_values = implode(',', (seedcareFields($csvColumn)));
-							$values  = implode(",", $seedcare_fields);
+								//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+								$values  = implode(",", $seedcare_fields);
 
-							if($row<$num){
-								$all_values.= "(".$values."),";
-							}else{
-	
-								// If the Last row is reach then write the sql
-								$all_values.= "(".$values.")";
-								$demographicsSQL = "INSERT INTO `$dtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
-	
-								// Execute the MySQLI Query
-								$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
-							}
+								if($row<$num){
+									$all_values.= "(".$values."),";
+								}else{
+		
+									// If the Last row is reach then write the sql
+									$all_values.= "(".$values.")";
+									$demographicsSQL = "INSERT INTO `$dtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+		
+									// Execute the MySQLI Query
+									$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
+								}
 
 						  }
 						
