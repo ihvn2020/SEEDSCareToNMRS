@@ -19,8 +19,8 @@ function mappedFields($csvColumn){
 }
 
 // Column names in NMRS Patient Table
-function nmrsFields(){
-    $nmrsColumns = array(
+function nmrspatientFields(){
+    $nmrspatientColumns = array(
         'patient_id', // Ptn_Pk
         'creator', // UserID
         'date_created', // CreateDate
@@ -32,13 +32,13 @@ function nmrsFields(){
         'allergy_status'
     );
 
-    return $nmrsColumns;
+    return $nmrspatientColumns;
         
 }
 
 //Column Names in Seed Care
-function seedcareFields($csvColumn){
-    $seedcareColumns = array(
+function seedcarepatientFields($csvColumn){
+    $seedcarepatientColumns = array(
         $csvColumn[0], // Ptn_Pk
         1, //$csvColumn[23], // UserID We use one for now because the demographics table has no creator value
         $csvColumn[24], // CreateDate
@@ -50,7 +50,7 @@ function seedcareFields($csvColumn){
         "'".$csvColumn[18]."'" // Status
     );
 
-    return $seedcareColumns;
+    return $seedcarepatientColumns;
         
 }
 
