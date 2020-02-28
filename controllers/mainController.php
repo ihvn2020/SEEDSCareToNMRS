@@ -28,7 +28,7 @@ class seedcareToNMRS {
 		
 		$data = trim($data);
 		$data = stripslashes($data);
-		// $data = real_escape_string($conn,$data);
+		$data = real_escape_string($conn,$data);
 		$data = htmlspecialchars($data);
 		return $data;
 	}
@@ -120,7 +120,7 @@ class seedcareToNMRS {
 						  foreach ($demographicsTable as $key => $dtable) {
 
 							// Truncate and remove the contents of the existing tables
-							mysqli_query($conn,"TRUNCATE patient") or die(mysqli_error($conn));
+							mysqli_query($conn,"TRUNCATE $dtable") or die(mysqli_error($conn));
 
 							if($dtable=='patient_identifier'){
 								$identifierList = array($csvColumn[39]=>3,$csvColumn[13]=>5,$csvColumn[11]=>6,$csvColumn[3]=>7,$csvColumn[36]=>8,$csvColumn[20]=>11);
@@ -152,7 +152,7 @@ class seedcareToNMRS {
 							}else{
 
 							
-								$nmrs_fields = 'nmrs'.$dtable.'Fields';
+								$nmrs_fields = 'nmrs'.$dtable.'Fields()';
 								$seedcare_fields = 'seedcare'.$dtable.'Fields('.$csvColumn.')';
 
 								// Get Columns from the arrays stored in each functions
