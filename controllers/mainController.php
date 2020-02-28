@@ -78,9 +78,7 @@ class seedcareToNMRS {
 				// Disable foreign key and dependency/relationship checks
 				mysqli_query($conn,"SET FOREIGN_KEY_CHECKS = 0");
 
-				// Truncate and remove the contents of the existing tables
-				mysqli_query($conn,"TRUNCATE patient") or die(mysqli_error($conn));
-				
+					
 				// Ensure that the File is uploaded
 				if ($_FILES["file"]["size"] > 0) {
 					
@@ -107,21 +105,53 @@ class seedcareToNMRS {
 						while (true) {
 							// Echo an extra line, and flush the buffers
 							// to ensure it gets displayed.
-							echo ' |';
+							echo ' .';
 							flush();
 							ob_flush();
 						  
 							// Now sleep for 1 second and check again (Not used yet):
 								// Progress Bar Code may be changed to Javascript
-							//sleep(1);
+							// sleep(1);
 						  }
 						  
 						  // List of Tables to update with data from the demographics CSV
-						  $demographicsTables = array('patient','patient_identifier','person','person_name','person_address');
+						  $demographicsTables = array('patient','person','person_name','person_address','patient_identifier');
 						
 						  foreach ($demographicsTable as $key => $dtable) {
 
-							if($dtable=='patient_identifier' )
+							// Truncate and remove the contents of the existing tables
+							mysqli_query($conn,"TRUNCATE patient") or die(mysqli_error($conn));
+
+							if($dtable=='patient_identifier'){
+								$identifierList = array($csvColumn[39]=>3,$csvColumn[13]=>5,$csvColumn[11]=>6,$csvColumn[3]=>7,$csvColumn[36]=>8,$csvColumn[20]=>11);
+								
+								foreach($identifierList as $identifier){
+
+									$nmrs_fields = 'nmrs'.$dtable.'Fields';
+									$seedcare_fields = 'seedcare'.$dtable.'Fields('.$csvColumn.')';
+
+									// Get Columns from the arrays stored in each functions
+									$columns = implode(", ",$nmrs_fields);
+
+									//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+									$values  = implode(",", $seedcare_fields);
+
+									if($row<$num){
+										$all_values.= "(".$values."),";
+									}else{
+			
+										// If the Last row is reach then write the sql
+										$all_values.= "(".$values.")";
+										$demographicsSQL = "INSERT INTO `$dtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+			
+										// Execute the MySQLI Query
+										$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
+									}
+									
+								}
+							}else{
+
+							
 								$nmrs_fields = 'nmrs'.$dtable.'Fields';
 								$seedcare_fields = 'seedcare'.$dtable.'Fields('.$csvColumn.')';
 
@@ -142,7 +172,7 @@ class seedcareToNMRS {
 									// Execute the MySQLI Query
 									$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
 								}
-
+							}
 						  }
 						
 
