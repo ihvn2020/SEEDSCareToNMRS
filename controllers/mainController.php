@@ -67,7 +67,7 @@ class seedcareToNMRS {
 
 	public function uploadCSV()
 	{
-		$conn = connectDB($_POST['servername'],$_POST['username'],$_POST['password'],$_POST['db']);
+			$conn = connectDB($_POST['servername'],$_POST['username'],$_POST['password'],$_POST['db']);
 			// CSV File Upload
 			// Check Form Sumbit?
 			if(isset($_POST["MigrateData"])){
@@ -85,119 +85,125 @@ class seedcareToNMRS {
 					// Open up the file
 					$file = fopen($fileName, "r");
 					
+					$getfile = file($fileName);
+					$rows = count($getfile);
+
 					$row = 1;
 					
-					
-
-					// Loop throught the Uploaded CSV File
-					while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
-						$all_values = "";
-						$currentMigration = "Migrating Patient: ". $csvColumn[0]."<hr>";
-						// Count all the rows
-						$num = count($csvColumn);
-
-						// Escape / Ignore the first row becuase it contains headings 
-						// and we need the headings to be there so that the column count won't throw error
-						if($row == 1){ $row++; continue; }
-
-						// Log progress in the console and on screen;
-						echo("<script>console.log('PHP: " . $currentMigration . "');</script>");
-						/*
-						while (true) {
-							// Echo an extra line, and flush the buffers
-							// to ensure it gets displayed.
-							echo ' .';
-							flush();
-							ob_flush();
-						  
-							// Now sleep for 1 second and check again (Not used yet):
-								// Progress Bar Code may be changed to Javascript
-							// sleep(1);
-						  }
-						  */
-						  
-						  // List of Tables to update with data from the demographics CSV
-						  $demographicsTables = array('patient','person','person_name','person_address');
+					// List of Tables to update with data from the demographics CSV
+					$demographicsTables = array('patient','person','person_name','person_address');
 						
-						  foreach ($demographicsTables as $key => $dtable) {
+					foreach ($demographicsTables as $key => $dtable) {
+							$all_values = "";
 
-							// Truncate and remove the contents of the existing tables
-							mysqli_query($conn,"TRUNCATE $dtable") or die(mysqli_error($conn));
-
-							if($dtable=='patient_identifier'){
-								$identifierList = array($csvColumn[39]=>3,$csvColumn[13]=>5,$csvColumn[11]=>6,$csvColumn[3]=>7,$csvColumn[36]=>8,$csvColumn[20]=>11);
+							// Loop throught the Uploaded CSV File
+							while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
 								
-								foreach($identifierList as $identifier){
+								$currentMigration = "Migrating Patient: ". $csvColumn[0]."<hr>";
+								// Count all the rows
+								
+								
 
-									$nmrs_fields = 'nmrs'.$dtable.'Fields';
-									$seedcare_fields = 'seedcare'.$dtable.'Fields';
+								// Escape / Ignore the first row becuase it contains headings 
+								// and we need the headings to be there so that the column count won't throw error
+								if($row == 1){ $row++; continue; }
 
-									// Get Columns from the arrays stored in each functions
-									$columns = implode(", ",call_user_func($nmrs_fields));
-
-									//$escaped_values = implode(',', (seedcareFields($csvColumn)));
-									$values  = implode(",", call_user_func($seedcare_fields,$csvColumn));
-									if($row<$num){
-										$all_values.= "(".$values."),";
-									}else{
-			
-										// If the Last row is reach then write the sql
-										$all_values.= "(".$values.")";
-										$demographicsSQL = "INSERT INTO `$dtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
-			
-										// Execute the MySQLI Query
-										$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
-									}
-									
+								// Log progress in the console and on screen;
+								echo("<script>console.log('PHP: " . $currentMigration . "');</script>");
+								/*
+								while (true) {
+									// Echo an extra line, and flush the buffers
+									// to ensure it gets displayed.
+									echo ' .';
+									flush();
+									ob_flush();
+								
+									// Now sleep for 1 second and check again (Not used yet):
+										// Progress Bar Code may be changed to Javascript
+									// sleep(1);
 								}
-							}else{
+								*/
+								
+								
 
-							
-								$nmrs_fields = 'nmrs'.$dtable.'Fields';
-								$seedcare_fields = 'seedcare'.$dtable.'Fields';
+									// Truncate and remove the contents of the existing tables
+									mysqli_query($conn,"TRUNCATE $dtable") or die(mysqli_error($conn));
 
-								// Get Columns from the arrays stored in each functions
-								$columns = implode(", ",call_user_func($nmrs_fields));
+									/*
+									if($dtable=='patient_identifier'){
+										$identifierList = array($csvColumn[39]=>3,$csvColumn[13]=>5,$csvColumn[11]=>6,$csvColumn[3]=>7,$csvColumn[36]=>8,$csvColumn[20]=>11);
+										
+										foreach($identifierList as $identifier){
 
-								//$escaped_values = implode(',', (seedcareFields($csvColumn)));
-								$values  = implode(",", call_user_func($seedcare_fields,$csvColumn));
+											$nmrs_fields = 'nmrs'.$dtable.'Fields';
+											$seedcare_fields = 'seedcare'.$dtable.'Fields';
 
-								if($row<$num){
-									$all_values.= "(".$values."),";
-								}else{
-		
-									// If the Last row is reach then write the sql
-									$all_values.= "(".$values.")";
-									$demographicsSQL = "INSERT INTO `$dtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
-		
-									// Execute the MySQLI Query
-									$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
-								}
-							}
-						  }
-						
+											// Get Columns from the arrays stored in each functions
+											$columns = implode(", ",call_user_func($nmrs_fields));
 
-									
-						
-						// Check if we have reached the last row (because it helps to right just one insert query)
-						// if not continue building up data to be uploaded once (helps to optimise)
-						
-						
-						if (! empty($result)) {
-							echo "<div class='success'>Patients\' CSV Data Imported into the Database</div>";
-						} else {
-							echo "<div class='success'>Problem in Importing CSV Data</div>";
-						}
-
-						// Increment row count
-						$row++;
-						$currentMigration="";
-					}
+											//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+											$values  = implode(",", call_user_func($seedcare_fields,$csvColumn));
+											if($row<$num){
+												$all_values.= "(".$values."),";
+											}else{
 					
-				}
+												// If the Last row is reach then write the sql
+												$all_values.= "(".$values.")";
+												$demographicsSQL = "INSERT INTO `$dtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+					
+												// Execute the MySQLI Query
+												$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
+											}
+											
+										}
+									}*/
+
+									
+										$nmrs_fields = 'nmrs'.$dtable.'Fields';
+										$seedcare_fields = 'seedcare'.$dtable.'Fields';
+
+										// Get Columns from the arrays stored in each functions
+										$columns = implode(", ",call_user_func($nmrs_fields));
+
+										//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+										$values  = implode(",", call_user_func($seedcare_fields,$csvColumn));
+
+										if($row<$rows){
+											$all_values.= "(".$values."),";
+										}else{
 				
-				// Reactivate the Foreign_Ket Checks so that table can be related properly
-				mysqli_query($conn,"SET FOREIGN_KEY_CHECKS = 1");
+											// If the Last row is reach then write the sql
+											$all_values.= "(".$values.")";
+											echo $demographicsSQL = "INSERT INTO `$dtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+				
+											// Execute the MySQLI Query
+											$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
+										}
+
+										// Increment row count
+								$row++;
+								$currentMigration="";
+									
+								}
+																	
+								
+								// Check if we have reached the last row (because it helps to right just one insert query)
+								// if not continue building up data to be uploaded once (helps to optimise)
+								
+								
+								if (!empty($result)) {
+									echo "<div class='success'> $dtable's CSV Data Imported into the Database</div>";
+								} else {
+									echo "<div class='success'>Problem in Importing CSV Data</div>";
+								}
+
+								
+							}
+					
+					}
+				
+					// Reactivate the Foreign_Ket Checks so that table can be related properly
+					mysqli_query($conn,"SET FOREIGN_KEY_CHECKS = 1");
 
 			}
 		
