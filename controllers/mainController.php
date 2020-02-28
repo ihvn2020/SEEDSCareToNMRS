@@ -28,7 +28,7 @@ class seedcareToNMRS {
 		
 		$data = trim($data);
 		$data = stripslashes($data);
-		$data = real_escape_string($conn,$data);
+		// $data = real_escape_string($conn,$data);
 		$data = htmlspecialchars($data);
 		return $data;
 	}
@@ -84,13 +84,14 @@ class seedcareToNMRS {
 					
 					// Open up the file
 					$file = fopen($fileName, "r");
-					$all_values = "";
+					
 					$row = 1;
 					
 					
 
 					// Loop throught the Uploaded CSV File
 					while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
+						$all_values = "";
 						$currentMigration = "Migrating Patient: ". $csvColumn[0]."<hr>";
 						// Count all the rows
 						$num = count($csvColumn);
@@ -100,8 +101,8 @@ class seedcareToNMRS {
 						if($row == 1){ $row++; continue; }
 
 						// Log progress in the console and on screen;
-						echo error_log($currentMigration);
-
+						echo("<script>console.log('PHP: " . $currentMigration . "');</script>");
+						/*
 						while (true) {
 							// Echo an extra line, and flush the buffers
 							// to ensure it gets displayed.
@@ -113,11 +114,12 @@ class seedcareToNMRS {
 								// Progress Bar Code may be changed to Javascript
 							// sleep(1);
 						  }
+						  */
 						  
 						  // List of Tables to update with data from the demographics CSV
-						  $demographicsTables = array('patient','person','person_name','person_address','patient_identifier');
+						  $demographicsTables = array('patient','person','person_name','person_address');
 						
-						  foreach ($demographicsTable as $key => $dtable) {
+						  foreach ($demographicsTables as $key => $dtable) {
 
 							// Truncate and remove the contents of the existing tables
 							mysqli_query($conn,"TRUNCATE $dtable") or die(mysqli_error($conn));
@@ -128,14 +130,13 @@ class seedcareToNMRS {
 								foreach($identifierList as $identifier){
 
 									$nmrs_fields = 'nmrs'.$dtable.'Fields';
-									$seedcare_fields = 'seedcare'.$dtable.'Fields('.$csvColumn.')';
+									$seedcare_fields = 'seedcare'.$dtable.'Fields';
 
 									// Get Columns from the arrays stored in each functions
-									$columns = implode(", ",$nmrs_fields);
+									$columns = implode(", ",call_user_func($nmrs_fields));
 
 									//$escaped_values = implode(',', (seedcareFields($csvColumn)));
-									$values  = implode(",", $seedcare_fields);
-
+									$values  = implode(",", call_user_func($seedcare_fields,$csvColumn));
 									if($row<$num){
 										$all_values.= "(".$values."),";
 									}else{
@@ -152,14 +153,14 @@ class seedcareToNMRS {
 							}else{
 
 							
-								$nmrs_fields = 'nmrs'.$dtable.'Fields()';
-								$seedcare_fields = 'seedcare'.$dtable.'Fields('.$csvColumn.')';
+								$nmrs_fields = 'nmrs'.$dtable.'Fields';
+								$seedcare_fields = 'seedcare'.$dtable.'Fields';
 
 								// Get Columns from the arrays stored in each functions
-								$columns = implode(", ",$nmrs_fields);
+								$columns = implode(", ",call_user_func($nmrs_fields));
 
 								//$escaped_values = implode(',', (seedcareFields($csvColumn)));
-								$values  = implode(",", $seedcare_fields);
+								$values  = implode(",", call_user_func($seedcare_fields,$csvColumn));
 
 								if($row<$num){
 									$all_values.= "(".$values."),";
