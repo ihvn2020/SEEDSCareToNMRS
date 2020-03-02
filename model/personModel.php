@@ -22,7 +22,7 @@ function seedcarepersonFields($csvColumn){
     $seedcarepersonColumns = array(
         $csvColumn[0], // Ptn_Pk
         "'".$csvColumn[6]."'", // Sex
-        date("Y-m-d", $csvColumn[7]),        
+        "'".date("Y-m-d", strtotime($csvColumn[7]))."'",         
         0, // $csvColumn[25], // DobPrecision
         0, // $csvColumn[?], // No Death Record in Seedscare
         $csvColumn[22], // DeleteFlag

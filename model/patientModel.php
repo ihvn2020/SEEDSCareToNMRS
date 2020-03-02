@@ -41,7 +41,7 @@ function seedcarepatientFields($csvColumn){
     $seedcarepatientColumns = array(
         $csvColumn[0], // Ptn_Pk
         1, //$csvColumn[23], // UserID We use one for now because the demographics table has no creator value
-        $csvColumn[24], // CreateDate
+        "'".date("Y-m-d", strtotime($csvColumn[24]))."'",  // CreateDate
         $csvColumn[23], // UserID
         $csvColumn[25], // UpdateDate
         $csvColumn[22], // Delete Flag
