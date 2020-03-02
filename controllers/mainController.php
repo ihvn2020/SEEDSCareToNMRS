@@ -82,24 +82,33 @@ class seedcareToNMRS {
 				// Ensure that the File is uploaded
 				if ($_FILES["file"]["size"] > 0) {
 					
-					// Open up the file
+					/* Open up the file
 					$file = fopen($fileName, "r");
 					
 					$getfile = file($fileName);
 					$rows = count($getfile);
+					*/
 
-					$row = 1;
+					
 					
 					// List of Tables to update with data from the demographics CSV
 					$demographicsTables = array('patient','person','person_name','person_address');
 						
 					foreach ($demographicsTables as $key => $dtable) {
 							$all_values = "";
+							$row = 1;
 
+							// Open up the file
+							$file = fopen($fileName, "r");
+							
+							$getfile = file($fileName);
+							$rows = count($getfile);
+
+							echo $dtable;
 							// Loop throught the Uploaded CSV File
 							while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
 								
-								$currentMigration = "Migrating Patient: ". $csvColumn[0]."<hr>";
+								$currentMigration = "Migrating ".$dtable." :". $csvColumn[0]."<hr>";
 								// Count all the rows
 								
 								
@@ -109,7 +118,7 @@ class seedcareToNMRS {
 								if($row == 1){ $row++; continue; }
 
 								// Log progress in the console and on screen;
-								echo("<script>console.log('PHP: " . $currentMigration . "');</script>");
+								// echo("<script>console.log('PHP: " . $currentMigration . "');</script>");
 								/*
 								while (true) {
 									// Echo an extra line, and flush the buffers

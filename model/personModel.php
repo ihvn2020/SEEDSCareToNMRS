@@ -9,7 +9,8 @@ function nmrspersonFields(){
         'birthdate_estimated',
         'dead',        
         'voided', // Delete Flag
-        'creator'
+        'creator',
+        'uuid'
     );
 
     return $nmrspersonColumns;
@@ -20,13 +21,13 @@ function nmrspersonFields(){
 function seedcarepersonFields($csvColumn){
     $seedcarepersonColumns = array(
         $csvColumn[0], // Ptn_Pk
-        1, //$csvColumn[23], // UserID We use one for now because the demographics table has no creator value
-        $csvColumn[6], // Sex
-        $csvColumn[7], // DOB
+        "'".$csvColumn[6]."'", // Sex
+        STR_TO_DATE($csvColumn[7],'%d-%m-%Y'), // DOB
         0, // $csvColumn[25], // DobPrecision
         0, // $csvColumn[?], // No Death Record in Seedscare
         $csvColumn[22], // DeleteFlag
-        1 // $csvColumn[23], // Supposed to be userID but is null
+        1, // $csvColumn[23], // Supposed to be userID but is null
+        "'".bin2hex(random_bytes(6))."'"
     );
 
     return $seedcarepersonColumns;
