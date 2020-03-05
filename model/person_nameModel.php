@@ -7,7 +7,8 @@ function nmrsperson_nameFields(){
         'person_id', // Ptn_Pk
         'given_name', // Firstname
         'middle_name', // Middlename
-        'family_name', //Lastname      
+        'family_name', //Lastname  
+        'date_created',    
         'voided', // Delete Flag
         'creator',
         'uuid'
@@ -26,6 +27,7 @@ function seedcareperson_nameFields($csvColumn){
         "'".$csvColumn[30]."'", // Middlename
         "'".$csvColumn[34]."'", // Lastname
         $csvColumn[22], // DeleteFlag
+        "'".date("Y-m-d", strtotime($csvColumn[24]))."'",
         1, // $csvColumn[23], // Supposed to be userID but is null
         "'".bin2hex(random_bytes(6))."'"
     );

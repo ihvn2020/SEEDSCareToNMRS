@@ -138,10 +138,11 @@ class seedcareToNMRS {
 									// Truncate and remove the contents of the existing tables
 									mysqli_query($conn,"TRUNCATE $dtable") or die(mysqli_error($conn));
 
-									/*
+									
 									if($dtable=='patient_identifier'){
-										$identifierList = array($csvColumn[39]=>3,$csvColumn[13]=>5,$csvColumn[11]=>6,$csvColumn[3]=>7,$csvColumn[36]=>8,$csvColumn[20]=>11);
-										
+										$identifierList = array(3,4,5,6);
+										$count_id = count($identifierList);
+										$r = 1;
 										foreach($identifierList as $identifier){
 
 											$nmrs_fields = 'nmrs'.$dtable.'Fields';
@@ -152,7 +153,7 @@ class seedcareToNMRS {
 
 											//$escaped_values = implode(',', (seedcareFields($csvColumn)));
 											$values  = implode(",", call_user_func($seedcare_fields,$csvColumn));
-											if($row<$num){
+											if($r<$count_id){
 												$all_values.= "(".$values."),";
 											}else{
 					
@@ -163,9 +164,11 @@ class seedcareToNMRS {
 												// Execute the MySQLI Query
 												$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
 											}
+
+											$r++;
 											
 										}
-									}*/
+									}else{
 
 									
 										$nmrs_fields = 'nmrs'.$dtable.'Fields';
@@ -190,6 +193,7 @@ class seedcareToNMRS {
 										}
 
 										// Increment row count
+									}
 								$row++;
 								$currentMigration="";
 									
@@ -210,6 +214,9 @@ class seedcareToNMRS {
 							}
 					
 					}
+
+					//Upload Patient Identifiers
+
 				
 					// Reactivate the Foreign_Ket Checks so that table can be related properly
 					mysqli_query($conn,"SET FOREIGN_KEY_CHECKS = 1");
