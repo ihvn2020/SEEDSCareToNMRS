@@ -228,7 +228,7 @@ class seedcareToNMRS {
 						break;
 
 						case 'Clinicals':
-							$clinicalTables = array('visits','orders','encounters','programs','obs');
+							$clinicalTables = array('visit','encounter','obs');
 								
 							foreach ($clinicalTables as $key => $cltable) {
 									//Load the Clinical CSV Data
