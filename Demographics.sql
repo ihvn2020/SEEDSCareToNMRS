@@ -5,9 +5,9 @@ Open symmetric key Key_CTC decryption by password='ttwbvXWpqb5WOLfLrBgisw=='
 
 	  
 	  SELECT  TOP 200 
-	   Ptn_Pk
+	   PatientEnrollmentID
       ,LocationID
-      ,PatientEnrollmentID
+      ,Ptn_Pk
       ,PatientClinicID
       ,ReferredFrom
       ,CAST(RegistrationDate AS DATE)AS RegistrationDate

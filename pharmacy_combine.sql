@@ -3,10 +3,11 @@
   SET @RegimenId = NULL
   SET @RegimenType = NULL
 
-  SELECT TOP 100 [Ptn_pk]
-      ,[VisitID]
-      ,[LocationID]
-      ,[OrderedBy]
+  SELECT TOP 100 VW_PatientPharmacyNonARV.Ptn_pk
+      ,mst_Patient.PatientEnrollmentID
+      ,VisitID
+      ,VW_PatientPharmacyNonARV.LocationID
+      ,OrderedBy
       --,[OrderedByDate]
       ,CAST(OrderedByDate AS DATE)AS OrderedByDate
       --,[DispensedBy]
@@ -17,39 +18,41 @@
       ,CAST(DispensedByDate AS DATE)AS DispensedByDate
       --,[ProgID]
       ,mst_Decode.Name AS ProgID
-      ,[OrderType]
-      ,[Height]
-      ,[Weight]
-      ,[ProviderID]
-      ,[PharmacyPeriodTaken]
-      ,[Drug_pk]
-      ,[DrugName]
-      ,[GenericID]
-      ,[GenericName]
+      ,OrderType
+      ,Height
+      ,Weight
+      ,ProviderID
+      ,PharmacyPeriodTaken
+      ,Drug_pk
+      ,DrugName
+      ,GenericID
+      ,GenericName
       ,@RegimenType AS RegimenType
       ,@RegimenId AS RegimenId
-      ,[Duration]
-      ,[OrderedQuantity]
-      ,[DispensedQuantity]
-      ,[Prophylaxis]
-      ,[DrugType]
-      ,[DrugTypeID]
+      ,Duration
+      ,OrderedQuantity
+      ,DispensedQuantity
+      ,Prophylaxis
+      ,DrugType
+      ,DrugTypeID
       --,[VisitDate]
       ,CAST(VisitDate AS DATE) AS VisitDate  
       --,[VisitType]
       ,VT.Name AS VisitType
-      ,[ptn_pharmacy_pk]
-  FROM [SEEDSCare].[dbo].[VW_PatientPharmacyNonARV]
+      ,ptn_pharmacy_pk
+  FROM VW_PatientPharmacyNonARV
   JOIN mst_Decode ON VW_PatientPharmacyNonARV.ProgID = mst_Decode.ID
   JOIN mst_Decode  VT ON VW_PatientPharmacyNonARV.ProgID = VT.ID
   JOIN mst_User ON VW_PatientPharmacyNonARV.DispensedBy = mst_User.UserID
+  JOIN mst_Patient ON mst_patient.Ptn_Pk = VW_PatientPharmacyNonARV.Ptn_pk
  
  UNION
   
-  SELECT TOP 100 [Ptn_pk]
-      ,[VisitID]
-      ,[LocationID]
-      ,[OrderedBy]
+  SELECT TOP 100 VW_PatientPharmacy.Ptn_pk
+      ,mst_Patient.PatientEnrollmentID
+      ,VisitID
+      ,VW_PatientPharmacy.LocationID
+      ,OrderedBy
       --,[OrderedByDate]
       ,CAST(OrderedByDate AS DATE)AS OrderedByDate
       --,[DispensedBy]
@@ -60,31 +63,32 @@
       ,CAST(DispensedByDate AS DATE)AS DispensedByDate
       --,[ProgID]
       ,mst_Decode.Name AS ProgID
-      ,[OrderType]
-      ,[Height]
-      ,[Weight]
-      ,[ProviderID]
-      ,[PharmacyPeriodTaken]
-      ,[Drug_pk]
-      ,[DrugName]
-      ,[GenericID]
-      ,[GenericName]
-      ,[RegimenType]
-      ,[RegimenId]
-      ,[Duration]
-      ,[OrderedQuantity]
-      ,[DispensedQuantity]
-      ,[Prophylaxis]
-      ,[DrugType]
-      ,[DrugTypeID]
+      ,OrderType
+      ,Height
+      ,Weight
+      ,ProviderID
+      ,PharmacyPeriodTaken
+      ,Drug_pk
+      ,DrugName
+      ,GenericID
+      ,GenericName
+      ,RegimenType
+      ,RegimenId
+      ,Duration
+      ,OrderedQuantity
+      ,DispensedQuantity
+      ,Prophylaxis
+      ,DrugType
+      ,DrugTypeID
       --,[VisitDate]
       ,CAST(VisitDate AS DATE) AS VisitDate  
       --,[VisitType]
       ,VT.Name AS VisitType
-      ,[ptn_pharmacy_pk]
-  FROM [SEEDSCare].[dbo].[VW_PatientPharmacy]
+      ,ptn_pharmacy_pk
+  FROM VW_PatientPharmacy
   JOIN mst_Decode ON VW_PatientPharmacy.ProgID = mst_Decode.ID
   JOIN mst_Decode  VT ON VW_PatientPharmacy.ProgID = VT.ID
   JOIN mst_User ON VW_PatientPharmacy.DispensedBy = mst_User.UserID
+  JOIN mst_Patient ON mst_Patient.Ptn_Pk = VW_PatientPharmacy.Ptn_pk
   
  ORDER BY Ptn_pk
