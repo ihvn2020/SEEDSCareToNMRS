@@ -1,32 +1,9 @@
 <?php
-    
-class clinicalDictionary{
-    
-    // Get the Clinic CSV Record and Store in variable;
-    public function clinicalCSV(){        
-        $clinicalCSV = array_map('str_getcsv', file('/assets/resources/clinicalcsv.csv'));
-        return $clinicalCSV;
-    }
 
-    // Get Concept ID of current column or variable name
-    function getCID($variableName){
-            //Get the Clinical CSV Data
-            // $clinicalCSV = $clinicalCSV();
-            
-            foreach(clinicalCSV() as $line){
-                if($line[0] != $variableName){
-                    continue;
-                }else if($line[0] == $variableName){
-                break;
-                    return $line[4];
-                }else{
-                    return "";
-                }
-            }
-    }
-    /* Fields that needs definition
+    /* Fields that needs definition which maps to Concept Dictionary
 
-        Ptn_pk/nLocationID
+        Ptn_pk
+        LocationID
         Visit_pk
         -Temp
         -RR
@@ -52,12 +29,73 @@ class clinicalDictionary{
         -TBStatus
         -STIStatus
     */
+
+class clinicalDictionary{
+    
+    /* Get the Clinic CSV Record and Store in variable;
+    public function clinicalCSV(){        
+        $clinicalCSV = array_map('str_getcsv', file('/assets/resources/clinicalcsv.csv'));
+        return $clinicalCSV;
+    }
+    */
+
+    // Get Concept ID of current column or variable name
+    function getCID($variablePosition){
+            //Get the Clinical CSV Data
+            // $clinicalCSV = $clinicalCSV();
+            
+            foreach($clinicalCSV as $line){
+                if($line[1] != $variablePosition){
+                    continue;
+                }else if($line[1] == $variablePosition){
+                break;
+                    return $line[6];
+                }else{
+                    return "";
+                }
+            }
+    }
+
+    // Get ConceptID Answers for value Coded Answers
+    function getAns($variablePosition,$rawAnswer){
+
+        foreach($clinicalCSV as $line){
+            if($line[1] != $variablePosition){
+                continue;
+            }else if($line[1] == $variablePosition && $line[4]=="numeric"){
+            break;
+                return $csvColumn[$variablePosition];
+            }else if($line[1] == $variablePosition && $line[5]==$rawAnswer){
+            break;
+                return $line[6];
+            }else{
+                return "";
+            }
+        }
+    }
+    
+    // Get ConceptID Answers for value Coded Answers
     function getCIDAns($variableName,$rawAnswer){
 
-        foreach(clinicalCSV() as $line){
+        foreach($clinicalCSV as $line){
             if($line[0] != $variableName){
                 continue;
             }else if($line[0] == $variableName && $line[4]==$rawAnswer){
+            break;
+                return $line[5];
+            }else{
+                return "";
+            }
+        }
+    }
+
+    // Get ConceptID Answers for value Coded Answers
+    function getNumericAns($variableName){
+
+        foreach($clinicalCSV as $line){
+            if($line[0] != $variableName){
+                continue;
+            }else if($line[0] == $variableName){
             break;
                 return $line[5];
             }else{

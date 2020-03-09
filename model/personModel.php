@@ -20,7 +20,7 @@ function nmrspersonFields(){
 //Column Names in Seed Care
 function seedcarepersonFields($csvColumn){
     $seedcarepersonColumns = array(
-        $csvColumn[0], // Ptn_Pk
+        $csvColumn[2], // Ptn_Pk
         "'".$csvColumn[6]."'", // Sex
         "'".date("Y-m-d", strtotime($csvColumn[7]))."'",         
         0, // $csvColumn[25], // DobPrecision

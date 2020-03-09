@@ -127,7 +127,7 @@
                                             <label for="data_category">Select Data Category</label>
                                             <select name="data_category" id="data_category" class="form-control">
                                                 <option value="Demographics">Demographics Data</option>
-                                                <option value="Clinical">Clinical Data</option>
+                                                <option value="Clinicals">Clinical Data</option>
                                                 <option value="Users">Users Data</option>
                                                 <option value="Lab">Laboratory Data</option>
                                                 <option value="All">All Data</option>
