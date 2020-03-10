@@ -3,8 +3,8 @@
   SET @RegimenId = NULL
   SET @RegimenType = NULL
 
-  SELECT TOP 100 VW_PatientPharmacyNonARV.Ptn_pk
-	  ,mst_Patient.PatientEnrollmentID
+  SELECT TOP 100 mst_Patient.PatientEnrollmentID
+      ,VW_PatientPharmacyNonARV.Ptn_pk
       ,VisitID
       ,VW_PatientPharmacyNonARV.LocationID
       ,OrderedBy
@@ -45,6 +45,7 @@
   JOIN mst_Decode  VT ON VW_PatientPharmacyNonARV.ProgID = VT.ID
   JOIN mst_User ON VW_PatientPharmacyNonARV.DispensedBy = mst_User.UserID
   JOIN mst_Patient ON mst_Patient.Ptn_Pk = VW_PatientPharmacyNonARV.Ptn_Pk
+  WHERE mst_Patient.PatientEnrollmentID IS NOT NULL
   
  
  
