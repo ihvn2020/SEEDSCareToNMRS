@@ -55,10 +55,9 @@ class seedcareToNMRS extends clinicalDictionary {
 	public function checkQuery($table,$conn,$vals,$type,$cols){
 		if($vals!=""){
 			$vals = substr($vals,0,-1);	
-			echo $obsSQL1 = "INSERT INTO `$table` ($cols,$type) VALUES $vals ON DUPLICATE KEY UPDATE voided=voided";
-			echo "<hr>";
+			$obsSQL = "INSERT INTO `$table` ($cols,$type) VALUES $vals ON DUPLICATE KEY UPDATE voided=voided";
 			// Execute the MySQLI Query
-			$result = mysqli_query($conn, $obsSQL1) or die(mysqli_error($conn));
+			$result = mysqli_query($conn, $obsSQL) or die(mysqli_error($conn));
 		}
 	}
 
@@ -123,7 +122,7 @@ class seedcareToNMRS extends clinicalDictionary {
 						case 'Demographics':
 							// List of Tables to update with data from the demographics CSV
 						
-							$demographicsTables = array('patient','person','person_name','person_address','patient_identifier');
+							$demographicsTables = array('patient','person','person_name','person_address','patient_identifier','obs');
 								
 							foreach ($demographicsTables as $key => $dtable) {
 									$all_values = "";
@@ -200,7 +199,110 @@ class seedcareToNMRS extends clinicalDictionary {
 													$r++;
 													
 												}
-											}else{
+											}elseif($dtable=='obs'){
+												// $clinicalCSV = array_map('str_getcsv', file('assets/resources/clinicals.csv'));
+
+												// Get the OBS Columns from the obsModel.php												
+												
+												$obsvalNumeric = "";
+												$obsvalCoded = "";
+												$obsvalDateTime = "";
+												$obsvalOthers = "";
+
+													$columns = obscolumns();
+													//Check if OBS Row is NULL
+													if($csvColumn[26]=="NULL" || $csvColumn[26]==""){
+														if(($row)!=($rows)){														
+															continue;
+														}else{														
+															$this->checkQuery($cltable,$conn,$obsvalNumeric,'value_numeric',$columns);
+															$this->checkQuery($cltable,$conn,$obsvalCoded,'value_coded',$columns);
+															$this->checkQuery($cltable,$conn,$obsvalDateTime,'value_datetime',$columns);
+															$this->checkQuery($cltable,$conn,$obsvalOthers,'value_text',$columns);
+														}
+											
+													}else{
+														$dictionary = new clinicalDictionary;
+														
+														$values="'".$csvColumn[0]."',"
+								 						."'".$dictionary->getCID($clinicalCSV,$obsrow)."',"
+														."'".$csvColumn[2]."',"
+														."'".$csvColumn[2]."',"
+														."'".$this->nmrsDateTime($csvColumn[12])."',"
+														."'".$csvColumn[1]."',"
+														."'".$this->getObsGroupID($obsrow)."',"
+														."'".$csvColumn[2]."',"														
+														."'".$csvColumn[11]."',"
+														."'".$this->nmrsDateTime($csvColumn[12])."',0,"
+														."'".bin2hex(random_bytes(6))."','Care Card Form',"
+														."'".$dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow])."'";
+
+														/*  Check Answe Returned
+														if($dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow])!=''){
+															echo "Answer: ". $dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow]);
+														}
+														*/
+
+														if(($row*$ocount)<($rows*$countObsFields)){															
+
+															switch (obsValueType($clinicalCSV,$obsrow)){
+																case "value_numeric":																	
+																	$obsvalNumeric.="(".$values."),";
+																	break;
+
+																case "value_coded":																	
+																	$obsvalCoded.="(".$values."),";
+																	break;
+
+																case "value_datetime":																	
+																	$obsvalDateTime.="(".$values."),";
+																	break;
+
+																default:																	
+																	$obsvalOthers.="(".$values."),";
+																	break;
+															}
+															
+														}else{
+								
+															// If the Last row is reach then write the sql
+															// $all_values.= "(".$values.")";
+
+															switch (obsValueType($clinicalCSV,$obsrow)){
+																case "value_numeric":																	
+																	$obsvalNumeric.="(".$values.")";
+																	break;
+
+																case "value_coded":																	
+																	$obsvalCoded.="(".$values.")";
+																	break;
+
+																case "value_datetime":																	
+																	$obsvalDateTime.="(".$values.")";
+																	break;
+
+																default:																	
+																	$obsvalOthers.="(".$values.")";
+																	break;
+															}															
+															
+															echo $obsSQL1 = "INSERT INTO `$cltable` ($columns,value_numeric) VALUES $obsvalNumeric ON DUPLICATE KEY UPDATE voided=voided";
+															$obsSQL2 = "INSERT INTO `$cltable` ($columns,value_coded) VALUES $obsvalCoded ON DUPLICATE KEY UPDATE voided=voided";
+															$obsSQL3 = "INSERT INTO `$cltable` ($columns,value_datetime) VALUES $obsvalDateTime ON DUPLICATE KEY UPDATE voided=voided";
+															$obsSQL4 = "INSERT INTO `$cltable` ($columns,value_text) VALUES $obsvalOthers ON DUPLICATE KEY UPDATE voided=voided";
+																							
+															// Execute the MySQLI Query
+															$result1 = mysqli_query($conn, $obsSQL1) or die(mysqli_error($conn));
+															$result2 = mysqli_query($conn, $obsSQL2) or die(mysqli_error($conn));
+															$result3 = mysqli_query($conn, $obsSQL3) or die(mysqli_error($conn));
+															$result4 = mysqli_query($conn, $obsSQL4) or die(mysqli_error($conn));
+															
+														}														
+														$ocount++;
+													}				
+												
+											}
+											else{
 
 											
 												$nmrs_fields = 'nmrs'.$dtable.'Fields';
@@ -444,9 +546,9 @@ class seedcareToNMRS extends clinicalDictionary {
 										
 										
 									if (!empty($result)) {
-										echo "<div class='success'> $cltable's CSV Data has been Imported into the Database</div>";
+										echo "<div class='alert alert-success'> $cltable's CSV Data has been Imported into the Database</div>";
 									} else {
-										echo "<div class='success'>Problem in Importing CSV Data</div>";
+										echo "<div class='alert alert-danger'>Problem in Importing CSV Data</div>";
 									}
 
 										
