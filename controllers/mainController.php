@@ -52,6 +52,16 @@ class seedcareToNMRS extends clinicalDictionary {
 		return NULL;
 	}
 
+	public function checkQuery($table,$conn,$vals,$type,$cols){
+		if($vals!=""){
+			$vals = substr($vals,0,-1);	
+			echo $obsSQL1 = "INSERT INTO `$table` ($cols,$type) VALUES $vals ON DUPLICATE KEY UPDATE voided=voided";
+			echo "<hr>";
+			// Execute the MySQLI Query
+			$result = mysqli_query($conn, $obsSQL1) or die(mysqli_error($conn));
+		}
+	}
+
 	// This Function checks the user submitted connection parameters and sends the success values to the upload form.
 	// Note** This process will be changed to an Ajax call, but in the interim - this works 
 	public function checkConnection(){
@@ -308,19 +318,11 @@ class seedcareToNMRS extends clinicalDictionary {
 														if(($row*$ocount)!=($rows*$countObsFields)){
 														$ocount++;
 														continue;
-													}else{
-
-														echo $obsSQL1 = "INSERT INTO `$cltable` ($columns,value_numeric) VALUES substr($obsvalNumeric,0,-1) ON DUPLICATE KEY UPDATE voided=voided";
-															$obsSQL2 = "INSERT INTO `$cltable` ($columns,value_coded) VALUES substr($obsvalCoded,0,-1) ON DUPLICATE KEY UPDATE voided=voided";
-															$obsSQL3 = "INSERT INTO `$cltable` ($columns,value_datetime) VALUES substr($obsvalDateTime,0,-1) ON DUPLICATE KEY UPDATE voided=voided";
-															$obsSQL4 = "INSERT INTO `$cltable` ($columns,value_text) VALUES substr($obsvalOthers,0,-1) ON DUPLICATE KEY UPDATE voided=voided";
-																							
-															// Execute the MySQLI Query
-															$result1 = mysqli_query($conn, $obsSQL1) or die(mysqli_error($conn));
-															$result2 = mysqli_query($conn, $obsSQL2) or die(mysqli_error($conn));
-															$result3 = mysqli_query($conn, $obsSQL3) or die(mysqli_error($conn));
-															$result4 = mysqli_query($conn, $obsSQL4) or die(mysqli_error($conn));
-
+													}else{														
+														$this->checkQuery($cltable,$conn,$obsvalNumeric,'value_numeric',$columns);
+														$this->checkQuery($cltable,$conn,$obsvalCoded,'value_coded',$columns);
+														$this->checkQuery($cltable,$conn,$obsvalDateTime,'value_datetime',$columns);
+														$this->checkQuery($cltable,$conn,$obsvalOthers,'value_text',$columns);
 														}
 											
 													}else{
@@ -336,7 +338,7 @@ class seedcareToNMRS extends clinicalDictionary {
 														."'".$csvColumn[2]."',"														
 														."'".$csvColumn[11]."',"
 														."'".$this->nmrsDateTime($csvColumn[12])."',0,"
-														."'".bin2hex(random_bytes(6))."',"
+														."'".bin2hex(random_bytes(6))."','Care Card Form',"
 														."'".$dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow])."'";
 
 														/*  Check Answe Returned
@@ -345,11 +347,7 @@ class seedcareToNMRS extends clinicalDictionary {
 														}
 														*/
 
-														if(($row*$ocount)<($rows*$countObsFields)){
-															// $all_values.="(".$values."),";
-															echo $row." ".$ocount."<hr>";
-
-															echo $row*$ocount."<==>".$rows*$countObsFields."<hr>";
+														if(($row*$ocount)<($rows*$countObsFields)){															
 
 															switch (obsValueType($clinicalCSV,$obsrow)){
 																case "value_numeric":																	
