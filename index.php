@@ -94,12 +94,18 @@
                        </div>
                        <div class="col-md-6">
                             <div class="form-group">
-                            <label for="connect"><small>Click &darr; Here to Connect</small></label>
+                            <?php
+                            if(isset($_POST['MigrateData'])){?>
+                                <label for="connect"><small>Click &darr; Here to Continue</small></label><hr>
+                                <input name="connect" id="connect" type="submit" class="btn btn-primary" value='Continue'>
+                            
+                            <?php }else{?>                            
+                                <label for="connect"><small>Click &darr; Here to Connect</small></label>
                                 <input name="connect" id="connect" type="submit" class="btn btn-primary" value='Connect to NMRS'>
+                            <?php } ?>
                             </div>
                        </div>
-                   </div>
-                   <?php // Ignore please // echo bin2hex(random_bytes(6)); ?>
+                   </div>                   
                    </form>
                </div>
            </div>
@@ -126,6 +132,7 @@
                                         <div class="form-group">
                                             <label for="data_category">Select Data Category</label>
                                             <select name="data_category" id="data_category" class="form-control">
+                                                <option value="">Please Select Data Type</option>
                                                 <option value="Demographics">Demographics Data</option>
                                                 <option value="Clinicals">Clinical Data</option>
                                                 <option value="Users">Users Data</option>

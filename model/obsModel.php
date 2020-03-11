@@ -1,7 +1,21 @@
 <?php
 
-function obsValueType($csvColumn,$columnName){
-   if($csvColumn[])
+function obsValueType($csvColumn,$obsrow){
+
+   foreach($clinicalCSV as $line){
+      if($line[1] != $obsrow){
+          continue;
+      }else if($line[1] == $obsrow){
+      break;
+          return $line[4];
+      }else {
+          return "value_text";
+      }
+  }
+
+   if($csvColumn[$obsrow]){
+
+   };
 }
 
 //List of OBS Columns that will be impacted by Seedcare Data
@@ -13,8 +27,7 @@ order_id,
 obs_datetime,
 location_id,
 obs_group_id,
-accession_number,"
-.obsValueType().",
+accession_number,
 creator,
 date_created,
 voided,

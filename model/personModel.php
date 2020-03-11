@@ -20,12 +20,12 @@ function nmrspersonFields(){
 //Column Names in Seed Care
 function seedcarepersonFields($csvColumn){
     $seedcarepersonColumns = array(
-        $csvColumn[2], // Ptn_Pk
+        "'".$csvColumn[2]."'", // Ptn_Pk
         "'".$csvColumn[6]."'", // Sex
         "'".date("Y-m-d", strtotime($csvColumn[7]))."'",         
-        0, // $csvColumn[25], // DobPrecision
+        "'".$csvColumn[25]."'", // DobPrecision
         0, // $csvColumn[?], // No Death Record in Seedscare
-        $csvColumn[22], // DeleteFlag
+        "'".$csvColumn[22]."'", // DeleteFlag
         1, // $csvColumn[23], // Supposed to be userID but is null
         "'".bin2hex(random_bytes(6))."'"
     );

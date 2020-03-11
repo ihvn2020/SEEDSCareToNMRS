@@ -78,9 +78,9 @@ class clinicalDictionary{
     function getCIDAns($variableName,$rawAnswer){
 
         foreach($clinicalCSV as $line){
-            if($line[0] != $variableName){
+            if($line[1] != $variableName){
                 continue;
-            }else if($line[0] == $variableName && $line[4]==$rawAnswer){
+            }else if($line[1] == $variableName && $line[4]==$rawAnswer){
             break;
                 return $line[5];
             }else{
@@ -93,9 +93,9 @@ class clinicalDictionary{
     function getNumericAns($variableName){
 
         foreach($clinicalCSV as $line){
-            if($line[0] != $variableName){
+            if($line[1] != $variableName){
                 continue;
-            }else if($line[0] == $variableName){
+            }else if($line[1] == $variableName){
             break;
                 return $line[5];
             }else{

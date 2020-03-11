@@ -1,20 +1,30 @@
 <?php
 
+//Get the Database Connection Parameters
 require 'config/database.php';
+
+//**********Demographics Models*****************//
 require 'model/patientModel.php';
 require 'model/patient_identifierModel.php';
 require 'model/personModel.php';
 require 'model/person_nameModel.php';
 require 'model/person_addressModel.php';
-//get connection parameters
-// require 'config/database.php';
+
+//**********Clinicals Models*******************//
+require 'model/obsModel.php';
+require 'model/encounterModel.php';
+require 'model/visitModel.php';
+
+//**********Dictionaries*********************//
+require 'dictionaries/clinicalDictionary.php';
 
 // This is the main class that will be used to do the migration proper.
-// Several methods will be created here inorder to perform the migration
+// Several methods will be created here inorder to perform the migration.
 class seedcareToNMRS {
 		private $facilityName = "";
 		private $datimId = "";
 		public $conn;
+		public $identifier;
 	
 		/*
 		function __construct( $facilityName, $datimId ) {
@@ -24,8 +34,7 @@ class seedcareToNMRS {
 		*/
 
 	// Validate Inputs Function
-	public function validateData($data){
-		
+	public function validateData($data){		
 		$data = trim($data);
 		$data = stripslashes($data);
 		// $data = real_escape_string($conn,$data);
@@ -115,7 +124,6 @@ class seedcareToNMRS {
 									$getfile = file($fileName);
 									$rows = count($getfile);
 
-									echo $dtable;
 									// Loop throught the Uploaded CSV File
 									while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
 										
@@ -147,7 +155,7 @@ class seedcareToNMRS {
 										
 
 											// Truncate and remove the contents of the existing tables
-											// mysqli_query($conn,"TRUNCATE $dtable") or die(mysqli_error($conn));
+											mysqli_query($conn,"TRUNCATE $dtable") or die(mysqli_error($conn));
 
 											
 											if($dtable=='patient_identifier'){
@@ -163,14 +171,16 @@ class seedcareToNMRS {
 													$columns = implode(", ",call_user_func($nmrs_fields));
 
 													//$escaped_values = implode(',', (seedcareFields($csvColumn)));
-													$values  = implode(",", call_user_func($seedcare_fields,$csvColumn));
-													if($r<$count_id){
+													$values  = implode(",", call_user_func($seedcare_fields,$csvColumn,$identifier));
+													if(($row*$r)<($rows*$count_id)){
+														// echo $row." - Patient No:".$csvColumn[0]."<br>";
+
 														$all_values.= "(".$values."),";
 													}else{
 							
 														// If the Last row is reach then write the sql
 														$all_values.= "(".$values.")";
-														$demographicsSQL = "INSERT INTO `$dtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+														$demographicsSQL = "INSERT INTO `$dtable` ($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
 							
 														// Execute the MySQLI Query
 														$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
@@ -197,7 +207,7 @@ class seedcareToNMRS {
 						
 													// If the Last row is reach then write the sql
 													$all_values.= "(".$values.")";
-													echo $demographicsSQL = "INSERT INTO `$dtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+													$demographicsSQL = "INSERT INTO `$dtable` ($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
 						
 													// Execute the MySQLI Query
 													$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
@@ -216,9 +226,9 @@ class seedcareToNMRS {
 										
 										
 										if (!empty($result)) {
-											echo "<div class='success'> $dtable's CSV Data has been Imported into the Database</div>";
+											echo "<div class='alert alert-success'> $dtable's CSV Data has been Imported into the Database</div>";											
 										} else {
-											echo "<div class='success'>Problem in Importing CSV Data</div>";
+											echo "<div class='alert alert-danger'>Problem in Importing CSV Data</div>";
 										}
 
 										
@@ -232,7 +242,7 @@ class seedcareToNMRS {
 								
 							foreach ($clinicalTables as $key => $cltable) {
 									//Load the Clinical CSV Data
-									$clinicalCSV = array_map('str_getcsv', file('/assets/resources/clinicals.csv'));
+									$clinicalCSV = array_map('str_getcsv', file('assets/resources/clinicals.csv'));
 
 									// List all the columns that will be used to generate obs data according to the CSV Uploaded
 
@@ -285,12 +295,17 @@ class seedcareToNMRS {
 											
 											if($cltable=='obs'){
 												// Get the OBS Columns from the obsModel.php
-												$columns = $obscolumns;
+												
 												$ocount = 1;
+												$obsvalNumeric = "";
+												$obsvalCoded = "";
+												$obsvalDateTime = "";
+												$obsvalOthers = "";
 
 												foreach($obsColumnNos as $obsrow){
+													$columns = $obscolumns.",".obsValueType($csvColumn,$obsrow);
 													//Check if OBS Row is NULL
-													if($csvColumn[$obsrow]=="NULL"){
+													if($csvColumn[$obsrow]=="NULL" || $csvColumn[$obsrow]=="" ){
 														$ocount++;
 														continue;
 													}else{
@@ -308,15 +323,59 @@ class seedcareToNMRS {
 														."'".bin2hex(random_bytes(6))."'";
 
 														if($row<$rows && $ocount<$countObsFields){
-															$all_values.= "(".$values."),";
+															// $all_values.="(".$values."),";
+
+															switch (obsValueType($csvColumn,$obsrow)){
+																case "value_numeric":																	
+																	$obsvalNumeric.="(".$values."),";
+																	break;
+
+																case "value_coded":																	
+																	$obsvalCoded.="(".$values."),";
+																	break;
+
+																case "value_datetime":																	
+																	$obsvalDateTime.="(".$values."),";
+																	break;
+
+																default:																	
+																	$obsvalOthers.="(".$values."),";
+																	break;
+															}
+															
 														}else{
 								
 															// If the Last row is reach then write the sql
-															$all_values.= "(".$values.")";
-															echo $obsSQL = "INSERT INTO `$cltable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
-								
+															// $all_values.= "(".$values.")";
+
+															switch (obsValueType($csvColumn,$obsrow)){
+																case "value_numeric":																	
+																	$obsvalNumeric.="(".$values.")";
+																	break;
+
+																case "value_coded":																	
+																	$obsvalCoded.="(".$values.")";
+																	break;
+
+																case "value_datetime":																	
+																	$obsvalDateTime.="(".$values.")";
+																	break;
+
+																default:																	
+																	$obsvalOthers.="(".$values.")";
+																	break;
+															}															
+															
+															echo $obsSQL1 = "INSERT INTO `$cltable`($columns,value_numeric) VALUES $obsvalNumeric ON DUPLICATE KEY UPDATE voided=voided";
+															echo $obsSQL2 = "INSERT INTO `$cltable`($columns,value_coded) VALUES $obsvalCoded ON DUPLICATE KEY UPDATE voided=voided";
+															echo $obsSQL3 = "INSERT INTO `$cltable`($columns,value_datetime) VALUES $obsvalDateTime ON DUPLICATE KEY UPDATE voided=voided";
+															echo $obsSQL4 = "INSERT INTO `$cltable`($columns,value_text) VALUES $obsvalOthers ON DUPLICATE KEY UPDATE voided=voided";
+																							
 															// Execute the MySQLI Query
-															$result = mysqli_query($conn, $obsSQL) or die(mysqli_error($conn));
+															$result1 = mysqli_query($conn, $obsSQL1) or die(mysqli_error($conn));
+															$result2 = mysqli_query($conn, $obsSQL2) or die(mysqli_error($conn));
+															$result3 = mysqli_query($conn, $obsSQL3) or die(mysqli_error($conn));
+															$result4 = mysqli_query($conn, $obsSQL4) or die(mysqli_error($conn));
 														}
 														
 														$ocount++;
