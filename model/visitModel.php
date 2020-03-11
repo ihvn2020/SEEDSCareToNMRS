@@ -25,12 +25,11 @@ function nmrsvisitFields(){
 //Column Names in Seed Care
 function seedcarevisitFields($csvColumn){
     $seedcarevisitColumns = array(
-        $csvColumn[2], // Encounter ID
-        5,
-        "'".$csvColumn[0]."'", // Patient ID
-        5, // Visit Type ID               
-        "'".date("Y-m-d", strtotime($csvColumn[12]))."'",
-        "'".date("Y-m-d", strtotime($csvColumn[12]))."'",
+        $csvColumn[2], // Visit ID
+        $csvColumn[0], // Patient ID
+        1, // Visit Type ID (Facility Visit)            
+        "'".date("Y-m-d", strtotime($csvColumn[12]))."'", // Date Started
+        "'".date("Y-m-d", strtotime($csvColumn[12]))."'", // Dtae Stopped
         $csvColumn[1], // Location ID
         "'".$csvColumn[11]."'", // Creator
         "'".date("Y-m-d", strtotime($csvColumn[12]))."'",        
@@ -42,4 +41,3 @@ function seedcarevisitFields($csvColumn){
         
 }
 
-?>

@@ -18,9 +18,10 @@ require 'model/visitModel.php';
 //**********Dictionaries*********************//
 require 'dictionaries/clinicalDictionary.php';
 
+
 // This is the main class that will be used to do the migration proper.
 // Several methods will be created here inorder to perform the migration.
-class seedcareToNMRS {
+class seedcareToNMRS extends clinicalDictionary {
 		private $facilityName = "";
 		private $datimId = "";
 		public $conn;
@@ -243,10 +244,10 @@ class seedcareToNMRS {
 							foreach ($clinicalTables as $key => $cltable) {
 									//Load the Clinical CSV Data
 									$clinicalCSV = array_map('str_getcsv', file('assets/resources/clinicals.csv'));
-
+									
 									// List all the columns that will be used to generate obs data according to the CSV Uploaded
 
-									$obsColumnNos = array(3,4,5,6,7,8,9,10,11,14,15,16,17,18,19,20,21,22,23,24,25);
+									$obsColumnNos = array(3,4,5,6,7,8,9,10,14,15,16,17,18,19,20,21,22,23,24,25);
 									$countObsFields = count($obsColumnNos);
 
 									$all_values = "";
@@ -258,14 +259,11 @@ class seedcareToNMRS {
 									$getfile = file($fileName);
 									$rows = count($getfile);
 
-									echo $cltable;
 									// Loop through the Uploaded CSV File
 									while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
 										
 										$currentMigration = "Migrating ".$cltable." :". $csvColumn[0]."<hr>";
 										// Count all the rows
-										
-										
 
 										// Escape / Ignore the first row becuase it contains headings 
 										// and we need the headings to be there so that the column count won't throw error
@@ -290,7 +288,7 @@ class seedcareToNMRS {
 										
 
 											// Truncate and remove the contents of the existing tables
-											// mysqli_query($conn,"TRUNCATE $dtable") or die(mysqli_error($conn));
+											// mysqli_query($conn,"TRUNCATE $cltable") or die(mysqli_error($conn));
 
 											
 											if($cltable=='obs'){
@@ -303,29 +301,57 @@ class seedcareToNMRS {
 												$obsvalOthers = "";
 
 												foreach($obsColumnNos as $obsrow){
-													$columns = $obscolumns.",".obsValueType($csvColumn,$obsrow);
+													// $columns = $obscolumns.",".obsValueType($csvColumn,$obsrow);
+													$columns = obscolumns();
 													//Check if OBS Row is NULL
-													if($csvColumn[$obsrow]=="NULL" || $csvColumn[$obsrow]=="" ){
+													if($csvColumn[$obsrow]=="NULL" || $csvColumn[$obsrow]==""){
+														if(($row*$ocount)!=($rows*$countObsFields)){
 														$ocount++;
 														continue;
 													}else{
+
+														echo $obsSQL1 = "INSERT INTO `$cltable` ($columns,value_numeric) VALUES substr($obsvalNumeric,0,-1) ON DUPLICATE KEY UPDATE voided=voided";
+															$obsSQL2 = "INSERT INTO `$cltable` ($columns,value_coded) VALUES substr($obsvalCoded,0,-1) ON DUPLICATE KEY UPDATE voided=voided";
+															$obsSQL3 = "INSERT INTO `$cltable` ($columns,value_datetime) VALUES substr($obsvalDateTime,0,-1) ON DUPLICATE KEY UPDATE voided=voided";
+															$obsSQL4 = "INSERT INTO `$cltable` ($columns,value_text) VALUES substr($obsvalOthers,0,-1) ON DUPLICATE KEY UPDATE voided=voided";
+																							
+															// Execute the MySQLI Query
+															$result1 = mysqli_query($conn, $obsSQL1) or die(mysqli_error($conn));
+															$result2 = mysqli_query($conn, $obsSQL2) or die(mysqli_error($conn));
+															$result3 = mysqli_query($conn, $obsSQL3) or die(mysqli_error($conn));
+															$result4 = mysqli_query($conn, $obsSQL4) or die(mysqli_error($conn));
+
+														}
+											
+													}else{
+														$dictionary = new clinicalDictionary;
+														
 														$values="'".$csvColumn[0]."',"
-														."'".getCID($obsrow)."',"
+								 						."'".$dictionary->getCID($clinicalCSV,$obsrow)."',"
 														."'".$csvColumn[2]."',"
 														."'".$csvColumn[2]."',"
-														."'".nmrsDateTime($csvColumn[12])."',"
+														."'".$this->nmrsDateTime($csvColumn[12])."',"
 														."'".$csvColumn[1]."',"
-														."'".getObsGroupID($obsrow)."',"
-														."'".$csvColumn[2]."',"
-														."'".getAns($obsrow,$csvColumn[$obsrow])."',"
+														."'".$this->getObsGroupID($obsrow)."',"
+														."'".$csvColumn[2]."',"														
 														."'".$csvColumn[11]."',"
-														."'".nmrsDateTime($csvColumn[12])."',0,"
-														."'".bin2hex(random_bytes(6))."'";
+														."'".$this->nmrsDateTime($csvColumn[12])."',0,"
+														."'".bin2hex(random_bytes(6))."',"
+														."'".$dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow])."'";
 
-														if($row<$rows && $ocount<$countObsFields){
+														/*  Check Answe Returned
+														if($dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow])!=''){
+															echo "Answer: ". $dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow]);
+														}
+														*/
+
+														if(($row*$ocount)<($rows*$countObsFields)){
 															// $all_values.="(".$values."),";
+															echo $row." ".$ocount."<hr>";
 
-															switch (obsValueType($csvColumn,$obsrow)){
+															echo $row*$ocount."<==>".$rows*$countObsFields."<hr>";
+
+															switch (obsValueType($clinicalCSV,$obsrow)){
 																case "value_numeric":																	
 																	$obsvalNumeric.="(".$values."),";
 																	break;
@@ -348,7 +374,7 @@ class seedcareToNMRS {
 															// If the Last row is reach then write the sql
 															// $all_values.= "(".$values.")";
 
-															switch (obsValueType($csvColumn,$obsrow)){
+															switch (obsValueType($clinicalCSV,$obsrow)){
 																case "value_numeric":																	
 																	$obsvalNumeric.="(".$values.")";
 																	break;
@@ -366,25 +392,22 @@ class seedcareToNMRS {
 																	break;
 															}															
 															
-															echo $obsSQL1 = "INSERT INTO `$cltable`($columns,value_numeric) VALUES $obsvalNumeric ON DUPLICATE KEY UPDATE voided=voided";
-															echo $obsSQL2 = "INSERT INTO `$cltable`($columns,value_coded) VALUES $obsvalCoded ON DUPLICATE KEY UPDATE voided=voided";
-															echo $obsSQL3 = "INSERT INTO `$cltable`($columns,value_datetime) VALUES $obsvalDateTime ON DUPLICATE KEY UPDATE voided=voided";
-															echo $obsSQL4 = "INSERT INTO `$cltable`($columns,value_text) VALUES $obsvalOthers ON DUPLICATE KEY UPDATE voided=voided";
+															echo $obsSQL1 = "INSERT INTO `$cltable` ($columns,value_numeric) VALUES $obsvalNumeric ON DUPLICATE KEY UPDATE voided=voided";
+															$obsSQL2 = "INSERT INTO `$cltable` ($columns,value_coded) VALUES $obsvalCoded ON DUPLICATE KEY UPDATE voided=voided";
+															$obsSQL3 = "INSERT INTO `$cltable` ($columns,value_datetime) VALUES $obsvalDateTime ON DUPLICATE KEY UPDATE voided=voided";
+															$obsSQL4 = "INSERT INTO `$cltable` ($columns,value_text) VALUES $obsvalOthers ON DUPLICATE KEY UPDATE voided=voided";
 																							
 															// Execute the MySQLI Query
 															$result1 = mysqli_query($conn, $obsSQL1) or die(mysqli_error($conn));
 															$result2 = mysqli_query($conn, $obsSQL2) or die(mysqli_error($conn));
 															$result3 = mysqli_query($conn, $obsSQL3) or die(mysqli_error($conn));
 															$result4 = mysqli_query($conn, $obsSQL4) or die(mysqli_error($conn));
-														}
-														
+															
+														}														
 														$ocount++;
-
 													}				
 												}
-
-												$row++;
-												$currentMigration="";
+											
 
 											}else{
 
@@ -404,7 +427,7 @@ class seedcareToNMRS {
 						
 													// If the Last row is reach then write the sql
 													$all_values.= "(".$values.")";
-													echo $clinicalsSQL = "INSERT INTO `$cltable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+													$clinicalsSQL = "INSERT INTO `$cltable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
 						
 													// Execute the MySQLI Query
 													$result = mysqli_query($conn, $clinicalsSQL) or die(mysqli_error($conn));
@@ -415,21 +438,21 @@ class seedcareToNMRS {
 										$row++;
 										$currentMigration="";
 											
-										}
+									}
 																			
 										
-										// Check if we have reached the last row (because it helps to right just one insert query)
-										// if not continue building up data to be uploaded once (helps to optimise)
+									// Check if we have reached the last row (because it helps to right just one insert query)
+									// if not continue building up data to be uploaded once (helps to optimise)
 										
 										
-										if (!empty($result)) {
-											echo "<div class='success'> $cltable's CSV Data has been Imported into the Database</div>";
-										} else {
-											echo "<div class='success'>Problem in Importing CSV Data</div>";
-										}
+									if (!empty($result)) {
+										echo "<div class='success'> $cltable's CSV Data has been Imported into the Database</div>";
+									} else {
+										echo "<div class='success'>Problem in Importing CSV Data</div>";
+									}
 
 										
-									}
+							}
 							
 							
 						break;
