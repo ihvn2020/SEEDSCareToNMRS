@@ -1,0 +1,13 @@
+SELECT TOP 100 UserID
+      ,UserLastName
+      ,UserFirstName
+      ,UserName
+      ,Password
+      ,DeleteFlag
+      ,OperatorID
+      --,CreateDate
+      ,CAST(CreateDate AS DATE)AS CreateDate
+      --,UpdateDate
+      ,CAST(UpdateDate AS DATE)AS UpdateDate
+      ,EmployeeId
+  FROM mst_User
