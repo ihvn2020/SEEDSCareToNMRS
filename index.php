@@ -114,6 +114,8 @@
            <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
+
+                   
                         <?php 
                         // Check whether user clicked the connect button
                         if(isset($_POST['connect'])){?>

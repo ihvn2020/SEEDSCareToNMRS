@@ -280,6 +280,29 @@ class seedcareToNMRS extends clinicalDictionary {
 													
 													}
 											
+											}elseif($dtable=='encounter'){
+												$nmrs_fields = 'nmrs'.$dtable.'Fields';
+												$seedcare_fields = 'seedcare'.$dtable.'Fields';
+
+												// Get Columns from the arrays stored in each functions
+												$columns = implode(", ",call_user_func($nmrs_fields));
+
+												//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+												$values  = implode(",", call_user_func($seedcare_fields,$csvColumn,$row));
+
+												if($row<$rows){
+													$all_values.= "(".$values."),";
+												}else{
+						
+													// If the Last row is reach then write the sql
+													$all_values.= "(".$values.")";
+													echo $demographicsSQL = "INSERT INTO `$dtable` ($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+						
+													// Execute the MySQLI Query
+													$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
+												}
+
+												// Increment row count
 											}else{
 
 											
@@ -298,7 +321,7 @@ class seedcareToNMRS extends clinicalDictionary {
 						
 													// If the Last row is reach then write the sql
 													$all_values.= "(".$values.")";
-													$demographicsSQL = "INSERT INTO `$dtable` ($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+													echo $demographicsSQL = "INSERT INTO `$dtable` ($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
 						
 													// Execute the MySQLI Query
 													$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
@@ -488,6 +511,27 @@ class seedcareToNMRS extends clinicalDictionary {
 												}
 											
 
+											}elseif($cltable=='encounter'){
+												$nmrs_fields = 'nmrs'.$cltable.'Fields';
+												$seedcare_fields = 'seedcare'.$cltable.'Fields';
+
+												// Get Columns from the arrays stored in each functions
+												$columns = implode(", ",call_user_func($nmrs_fields));
+
+												//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+												$values  = implode(",", call_user_func($seedcare_fields,$csvColumn,$row));
+
+												if($row<$rows){
+													$all_values.= "(".$values."),";
+												}else{
+						
+													// If the Last row is reach then write the sql
+													$all_values.= "(".$values.")";
+													$clinicalsSQL = "INSERT INTO `$cltable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+						
+													// Execute the MySQLI Query
+													$result = mysqli_query($conn, $clinicalsSQL) or die(mysqli_error($conn));
+												}
 											}else{
 
 											
