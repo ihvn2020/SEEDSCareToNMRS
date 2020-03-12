@@ -23,10 +23,17 @@ function nmrsencounterFields(){
         
 }
 
+function getEncounterID($csvColumn){
+    if(is_int($csvColumn)){
+        return $csvColumn[2];
+    }else{
+        return $csvColumn[0];
+    }
+}
 //Column Names in Seed Care
 function seedcareencounterFields($csvColumn){
     $seedcareencounterColumns = array(
-        $csvColumn[2], // Encounter ID
+        getEncounterID($csvColumn[2]), // Encounter ID
         5,
         "'".$csvColumn[0]."'", // Patient ID
         "'".$csvColumn[1]."'", // Location ID

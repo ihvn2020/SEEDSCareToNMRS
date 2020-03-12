@@ -122,7 +122,7 @@ class seedcareToNMRS extends clinicalDictionary {
 						case 'Demographics':
 							// List of Tables to update with data from the demographics CSV
 						
-							$demographicsTables = array('patient','person','person_name','person_address','patient_identifier','obs');
+							$demographicsTables = array('patient','person','person_name','person_address','patient_identifier','encounter','obs');
 								
 							foreach ($demographicsTables as $key => $dtable) {
 									$all_values = "";
@@ -201,31 +201,37 @@ class seedcareToNMRS extends clinicalDictionary {
 												}
 											}elseif($dtable=='obs'){
 												// $clinicalCSV = array_map('str_getcsv', file('assets/resources/clinicals.csv'));
-
+												// Get all the HIV Enrollment Dates
 												// Get the OBS Columns from the obsModel.php												
 												
 												$obsvalNumeric = "";
 												$obsvalCoded = "";
 												$obsvalDateTime = "";
+												$obsvalText = "";
 												$obsvalOthers = "";
 
+
 													$columns = obscolumns();
-													//Check if OBS Row is NULL
-													if($csvColumn[26]=="NULL" || $csvColumn[26]==""){
-														if(($row)!=($rows)){														
-															continue;
-														}else{														
-															$this->checkQuery($cltable,$conn,$obsvalNumeric,'value_numeric',$columns);
-															$this->checkQuery($cltable,$conn,$obsvalCoded,'value_coded',$columns);
-															$this->checkQuery($cltable,$conn,$obsvalDateTime,'value_datetime',$columns);
-															$this->checkQuery($cltable,$conn,$obsvalOthers,'value_text',$columns);
+													$obsrows = hivEnrollentConcepts($csvColumn);
+													$obsrowcount = count($obsrowcount);
+													$obsrowc = 1;
+													/*
+													"conceptID" => 164947,
+													"dataType" => "value_coded",
+													"conceptAns" => 164949,
+													"csvcol" => ""
+													*/
+
+													foreach($obsrows as $obsrw){
+
+														if($obsrw['conceptAns']!=""){
+															$answer = $obsrw['conceptAns'];
+														}else{
+															$answer = $obsrw['csvcol'];
 														}
-											
-													}else{
-														$dictionary = new clinicalDictionary;
-														
+
 														$values="'".$csvColumn[0]."',"
-								 						."'".$dictionary->getCID($clinicalCSV,$obsrow)."',"
+								 						."'".$obsrow['conceptID']."',"
 														."'".$csvColumn[2]."',"
 														."'".$csvColumn[2]."',"
 														."'".$this->nmrsDateTime($csvColumn[12])."',"
@@ -235,74 +241,46 @@ class seedcareToNMRS extends clinicalDictionary {
 														."'".$csvColumn[11]."',"
 														."'".$this->nmrsDateTime($csvColumn[12])."',0,"
 														."'".bin2hex(random_bytes(6))."','Care Card Form',"
-														."'".$dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow])."'";
+														."'".$answer."'";
 
-														/*  Check Answe Returned
-														if($dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow])!=''){
-															echo "Answer: ". $dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow]);
+														switch ($obsrw['dataType']){
+															case "value_numeric":																	
+																$obsvalNumeric.="(".$values."),";
+																break;
+
+															case "value_coded":																	
+																$obsvalCoded.="(".$values."),";
+																break;
+
+															case "value_datetime":																	
+																$obsvalDateTime.="(".$values."),";
+																break;
+															
+															case "value_text":																	
+																$obsvalText.="(".$values."),";
+																break;
+
+															default:																	
+																$obsvalOthers.="(".$values."),";
+																break;
 														}
-														*/
 
-														if(($row*$ocount)<($rows*$countObsFields)){															
+														// Check the End of OBS Rows
 
-															switch (obsValueType($clinicalCSV,$obsrow)){
-																case "value_numeric":																	
-																	$obsvalNumeric.="(".$values."),";
-																	break;
+														if(($row*$obsrowc)==($rows*$obsrowcount)){
+															$this->checkQuery($cltable,$conn,$obsvalNumeric,'value_numeric',$columns);
+															$this->checkQuery($cltable,$conn,$obsvalCoded,'value_coded',$columns);
+															$this->checkQuery($cltable,$conn,$obsvalDateTime,'value_datetime',$columns);
+															$this->checkQuery($cltable,$conn,$obsvalText,'value_text',$columns);
+															$this->checkQuery($cltable,$conn,$obsvalOthers,'value_text',$columns);
+														}
 
-																case "value_coded":																	
-																	$obsvalCoded.="(".$values."),";
-																	break;
+														$obsrowc++;									
 
-																case "value_datetime":																	
-																	$obsvalDateTime.="(".$values."),";
-																	break;
-
-																default:																	
-																	$obsvalOthers.="(".$values."),";
-																	break;
-															}
-															
-														}else{
-								
-															// If the Last row is reach then write the sql
-															// $all_values.= "(".$values.")";
-
-															switch (obsValueType($clinicalCSV,$obsrow)){
-																case "value_numeric":																	
-																	$obsvalNumeric.="(".$values.")";
-																	break;
-
-																case "value_coded":																	
-																	$obsvalCoded.="(".$values.")";
-																	break;
-
-																case "value_datetime":																	
-																	$obsvalDateTime.="(".$values.")";
-																	break;
-
-																default:																	
-																	$obsvalOthers.="(".$values.")";
-																	break;
-															}															
-															
-															echo $obsSQL1 = "INSERT INTO `$cltable` ($columns,value_numeric) VALUES $obsvalNumeric ON DUPLICATE KEY UPDATE voided=voided";
-															$obsSQL2 = "INSERT INTO `$cltable` ($columns,value_coded) VALUES $obsvalCoded ON DUPLICATE KEY UPDATE voided=voided";
-															$obsSQL3 = "INSERT INTO `$cltable` ($columns,value_datetime) VALUES $obsvalDateTime ON DUPLICATE KEY UPDATE voided=voided";
-															$obsSQL4 = "INSERT INTO `$cltable` ($columns,value_text) VALUES $obsvalOthers ON DUPLICATE KEY UPDATE voided=voided";
-																							
-															// Execute the MySQLI Query
-															$result1 = mysqli_query($conn, $obsSQL1) or die(mysqli_error($conn));
-															$result2 = mysqli_query($conn, $obsSQL2) or die(mysqli_error($conn));
-															$result3 = mysqli_query($conn, $obsSQL3) or die(mysqli_error($conn));
-															$result4 = mysqli_query($conn, $obsSQL4) or die(mysqli_error($conn));
-															
-														}														
-														$ocount++;
-													}				
-												
-											}
-											else{
+													
+													}
+											
+											}else{
 
 											
 												$nmrs_fields = 'nmrs'.$dtable.'Fields';
@@ -411,6 +389,7 @@ class seedcareToNMRS extends clinicalDictionary {
 												$obsvalCoded = "";
 												$obsvalDateTime = "";
 												$obsvalOthers = "";
+												$obsvalText = "";
 
 												foreach($obsColumnNos as $obsrow){
 													// $columns = $obscolumns.",".obsValueType($csvColumn,$obsrow);
