@@ -213,7 +213,7 @@ class seedcareToNMRS extends clinicalDictionary {
 
 													$columns = obscolumns();
 													$obsrows = hivEnrollentConcepts($csvColumn);
-													$obsrowcount = count($obsrowcount);
+													$obsrowcount = count($obsrows);
 													$obsrowc = 1;
 													/*
 													"conceptID" => 164947,
@@ -222,12 +222,12 @@ class seedcareToNMRS extends clinicalDictionary {
 													"csvcol" => ""
 													*/
 
-													foreach($obsrows as $obsrw){
+													foreach($obsrows as $obsrow){
 
-														if($obsrw['conceptAns']!=""){
-															$answer = $obsrw['conceptAns'];
+														if($obsrow['conceptAns']!=""){
+															$answer = $obsrow['conceptAns'];
 														}else{
-															$answer = $obsrw['csvcol'];
+															$answer = $obsrow['csvcol'];
 														}
 
 														$values="'".$csvColumn[0]."',"
@@ -236,14 +236,14 @@ class seedcareToNMRS extends clinicalDictionary {
 														."'".$csvColumn[2]."',"
 														."'".$this->nmrsDateTime($csvColumn[12])."',"
 														."'".$csvColumn[1]."',"
-														."'".$this->getObsGroupID($obsrow)."',"
+														."'".$this->getObsGroupID($obsrowc)."',"
 														."'".$csvColumn[2]."',"														
 														."'".$csvColumn[11]."',"
 														."'".$this->nmrsDateTime($csvColumn[12])."',0,"
 														."'".bin2hex(random_bytes(6))."','Care Card Form',"
 														."'".$answer."'";
 
-														switch ($obsrw['dataType']){
+														switch ($obsrow['dataType']){
 															case "value_numeric":																	
 																$obsvalNumeric.="(".$values."),";
 																break;
@@ -329,6 +329,7 @@ class seedcareToNMRS extends clinicalDictionary {
 
 												// Increment row count
 											}
+											
 										$row++;
 										$currentMigration="";
 											
