@@ -122,10 +122,11 @@ class seedcareToNMRS extends clinicalDictionary {
 						case 'Demographics':
 							// List of Tables to update with data from the demographics CSV
 						
-							$demographicsTables = array('patient','person','person_name','person_address','patient_identifier','encounter','obs');
+							$demographicsTables = array('patient','person','person_name','person_address','visit','patient_identifier','encounter','obs');
 								
 							foreach ($demographicsTables as $key => $dtable) {
 									$all_values = "";
+									$visitArray = array();
 									$row = 1;
 
 									// Open up the file
@@ -165,7 +166,7 @@ class seedcareToNMRS extends clinicalDictionary {
 										
 
 											// Truncate and remove the contents of the existing tables
-											mysqli_query($conn,"TRUNCATE $dtable") or die(mysqli_error($conn));
+											// mysqli_query($conn,"TRUNCATE $dtable") or die(mysqli_error($conn));
 
 											
 											if($dtable=='patient_identifier'){
@@ -268,11 +269,11 @@ class seedcareToNMRS extends clinicalDictionary {
 														// Check the End of OBS Rows
 
 														if(($row*$obsrowc)==($rows*$obsrowcount)){
-															$this->checkQuery($cltable,$conn,$obsvalNumeric,'value_numeric',$columns);
-															$this->checkQuery($cltable,$conn,$obsvalCoded,'value_coded',$columns);
-															$this->checkQuery($cltable,$conn,$obsvalDateTime,'value_datetime',$columns);
-															$this->checkQuery($cltable,$conn,$obsvalText,'value_text',$columns);
-															$this->checkQuery($cltable,$conn,$obsvalOthers,'value_text',$columns);
+															$this->checkQuery($dtable,$conn,$obsvalCoded,'value_coded',$columns);
+															$this->checkQuery($dtable,$conn,$obsvalNumeric,'value_numeric',$columns);
+															$this->checkQuery($dtable,$conn,$obsvalDateTime,'value_datetime',$columns);
+															$this->checkQuery($dtable,$conn,$obsvalText,'value_text',$columns);
+															$this->checkQuery($dtable,$conn,$obsvalOthers,'value_text',$columns);
 														}
 
 														$obsrowc++;									
@@ -304,10 +305,12 @@ class seedcareToNMRS extends clinicalDictionary {
 
 												// Increment row count
 											}else{
-
-											
+										
 												$nmrs_fields = 'nmrs'.$dtable.'Fields';
 												$seedcare_fields = 'seedcare'.$dtable.'Fields';
+
+												// To be kept in a text file
+												$visitArray.=array($csvColumn[0].','.$csvColumn[12].','.$csvColumn[41]).",";
 
 												// Get Columns from the arrays stored in each functions
 												$columns = implode(", ",call_user_func($nmrs_fields));
@@ -325,6 +328,14 @@ class seedcareToNMRS extends clinicalDictionary {
 						
 													// Execute the MySQLI Query
 													$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
+
+													// To be kept in a text file (last)
+													$visitArray=array_combine($visitArray,array($csvColumn[0].','.$csvColumn[12].','.$csvColumn[41]));
+													// serialize your array and store in a Text File
+														$serializedData = serialize($visitArray);
+
+														// save serialized data in a text file
+														file_put_contents('firstVisit.txt', $serializedData);
 												}
 
 												// Increment row count
@@ -581,13 +592,14 @@ class seedcareToNMRS extends clinicalDictionary {
 							
 						break;
 
-						case 'Users':
+						case 'Pharmacy':
+
 						break;
 
 						case 'Lab':
 						break;
 
-						case 'All':
+						case 'Users':
 						break;
 
 						default:

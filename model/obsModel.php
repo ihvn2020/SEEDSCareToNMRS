@@ -181,3 +181,147 @@ function hivEnrollentConcepts($csvColumn){
 
       return $obsCols;
 }
+
+function getTreatmentType($csvColumn){
+    if($csvColumn=="ARV Medication"){
+        return 165303;
+    }else{
+        return 165941;
+    }
+}
+
+function getVisitType($csvColumn,$firstVisit){
+    
+        if(isset($firstVisit[$csvColumn[0]][0])){
+            return 160530;
+        }else{
+            return 164180;
+        }
+}
+function getPregnancyStatus($csvColumn,$firstVisit){
+
+    // Get First Visit Array   
+														
+    // $firstVisitTxt = file_get_contents('firstVisit.txt');													
+    // $firstVisit = unserialize($firstVisitTxt);
+
+    if($firstVisit[$csvColumn[0]][2]!='NULL'){
+        return 165047;
+    }else{
+        return 165048;
+    }
+}
+
+function getPickupReason($csvColumn,$firstVisit){
+    
+    if(isset($firstVisit[$csvColumn[0]][0])){
+        return 165662;
+    }else{
+        return 165773;
+    }
+}
+
+function getAgeGroup($csvColumn,$firstVisit){
+    if(isset($firstVisit[$csvColumn[0]][3])){
+
+        $d1 = new DateTime(strtotime($firstVisit[$csvColumn[0]][3]));
+        $d2 = new DateTime(strtotime($csvColumn[5]));
+
+        $diff = $d2->diff($d1);
+
+        $age = $diff->y;
+
+        if($age<15){
+
+            return 1528;
+        }else{
+            return 165709;
+        }
+    }
+}
+
+function getRegimenLine($csvColumn,$firstVisit){
+    switch(getAgeGroup($csvColumn,$firstVisit)){
+        case 1528: // Child
+            if(substr($csvColumn[18], -2)=='/r'){
+                return 164514; // Child Second Line
+            }else{
+                return 164507; // Child First Line
+            }
+        break;
+
+        case 165709: // Adult
+            if(substr($csvColumn[18], -2)=='/r'){
+                return 164513; // Adult Second Line
+            }else{
+                return 164506; // Adult First Line
+            }
+        break;
+    }
+}
+function pharmacyConcepts($csvColumn,$firstVisit){
+    // Used in populating pharmacy order form
+    $pharmConcepts = array(
+        // Treatment Type
+        array(
+            "conceptID" => 165945,
+            "dataType" => "value_coded",
+            "conceptAns" => getTreatmentType($csvColumn[24]),
+            "csvcol" => ""
+        ),
+        //Type of Visit
+        // Note* Some codes to check type of visit will be created
+        array(
+            "conceptID" => 164181,
+            "dataType" => "value_coded",
+            "conceptAns" => getVisitType($csvColumn,$firstVisit),
+            "csvcol" => ""
+        ),
+        // Pregnancy/Breast Feeding Status
+        // Some Code needed
+        array(
+            "conceptID" => 165050,
+            "dataType" => "value_coded",
+            "conceptAns" => getPregnancyStatus($csvColumn,$firstVisit),
+            "csvcol" => ""
+        ),
+        // Pick up Reason
+        array(
+            "conceptID" => 165774,
+            "dataType" => "value_coded",
+            "conceptAns" => getPickupReason($csvColumn,$firstVisit),
+            "csvcol" => ""
+        ),
+
+        // get Adult or Child
+        array(
+            "conceptID" => 165720,
+            "dataType" => "value_coded",
+            "conceptAns" => getAgeGroup($csvColumn,$firstVisit),
+            "csvcol" => ""
+        ),
+
+        // Current Regiment Line
+        array(
+            "conceptID" => 165708,
+            "dataType" => "value_coded",
+            "conceptAns" => getRegimenLine($csvColumn,$firstVisit),
+            "csvcol" => ""
+        ),
+
+        // ARV Regimen **Under Construction ***
+        array(
+            "conceptID" => getARVConcep($csvColumn,$firstVisit),
+            "dataType" => "value_coded",
+            "conceptAns" => getRegimenLine($csvColumn,$firstVisit),
+            "csvcol" => ""
+        ),
+
+        
+
+        
+        
+      );
+
+      return $pharmConcepts;
+}

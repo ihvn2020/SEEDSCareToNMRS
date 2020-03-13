@@ -137,9 +137,9 @@
                                                 <option value="">Please Select Data Type</option>
                                                 <option value="Demographics">Demographics Data</option>
                                                 <option value="Clinicals">Clinical Data</option>
-                                                <option value="Users">Users Data</option>
+                                                <option value="Pharmacy">Pharmacy Data</option>
                                                 <option value="Lab">Laboratory Data</option>
-                                                <option value="All">All Data</option>
+                                                <option value="Users">Users Data</option>
                                             </select>
                                         </div>                            
                                     </div>
