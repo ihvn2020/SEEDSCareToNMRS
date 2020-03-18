@@ -3,6 +3,7 @@
   SET @RegimenId = NULL
   SET @RegimenType = NULL
 
+  --SELECT DISTINCT 
   SELECT TOP 100 mst_Patient.PatientEnrollmentID
       ,VW_PatientPharmacyNonARV.Ptn_pk
       ,VisitID
@@ -25,17 +26,17 @@
       ,PharmacyPeriodTaken
       ,Drug_pk
       ,DrugName
-      ,GenericID
+      ,VW_PatientPharmacyNonARV.GenericID
       ,GenericName
       ,@RegimenType AS RegimenType
+      ,mst_Strength.StrengthName
       ,@RegimenId AS RegimenId
       ,Duration
       ,OrderedQuantity
       ,DispensedQuantity
       ,Prophylaxis
-      ,DrugType
-      ,DrugTypeID
-      --,[VisitDate]
+      --,DrugType
+      --,DrugTypeID
       ,CAST(VisitDate AS DATE) AS VisitDate  
       --,[VisitType]
       ,VT.Name AS VisitType
@@ -44,23 +45,29 @@
   JOIN mst_Decode ON VW_PatientPharmacyNonARV.ProgID = mst_Decode.ID
   JOIN mst_Decode  VT ON VW_PatientPharmacyNonARV.ProgID = VT.ID
   JOIN mst_User ON VW_PatientPharmacyNonARV.DispensedBy = mst_User.UserID
-  JOIN mst_Patient ON mst_patient.Ptn_Pk = VW_PatientPharmacyNonARV.Ptn_pk
+  JOIN mst_Patient ON mst_Patient.Ptn_Pk = VW_PatientPharmacyNonARV.Ptn_Pk
+  JOIN lnk_DrugStrength ON VW_PatientPharmacyNonARV.GenericID = lnk_DrugStrength.GenericID
+  JOIN mst_Strength ON lnk_DrugStrength.StrengthId = mst_Strength.StrengthId
+  WHERE mst_Patient.PatientEnrollmentID IS NOT NULL
+  
  
  UNION
   
-  SELECT TOP 100 mst_Patient.PatientEnrollmentID
+  
+--SELECT DISTINCT 
+SELECT TOP 100 mst_Patient.PatientEnrollmentID
 	  ,VW_PatientPharmacy.Ptn_pk
       ,VisitID
       ,VW_PatientPharmacy.LocationID
       ,OrderedBy
       --,[OrderedByDate]
-      ,CAST(OrderedByDate AS DATE)AS OrderedByDate
+      ,CAST(VW_PatientPharmacy.OrderedByDate AS DATE)AS OrderedByDate
       --,[DispensedBy]
       ,mst_User.UserFirstName AS DispensedBy
       --,mst_user.UserLastName AS LastName
       --,CONCAT(mst_user.UserFirstName,mst_User.UserLastName)
       --,[DispensedByDate]
-      ,CAST(DispensedByDate AS DATE)AS DispensedByDate
+      ,CAST(VW_PatientPharmacy.DispensedByDate AS DATE)AS DispensedByDate
       --,[ProgID]
       ,mst_Decode.Name AS ProgID
       ,OrderType
@@ -70,18 +77,19 @@
       ,PharmacyPeriodTaken
       ,Drug_pk
       ,DrugName
-      ,GenericID
+      ,VW_PatientPharmacy.GenericID
       ,GenericName
       ,RegimenType
-      ,RegimenId
+      ,mst_Strength.StrengthName
+      ,RegimenId 
       ,Duration
       ,OrderedQuantity
       ,DispensedQuantity
       ,Prophylaxis
-      ,DrugType
-      ,DrugTypeID
+      --,DrugType
+      --,DrugTypeID
       --,[VisitDate]
-      ,CAST(VisitDate AS DATE) AS VisitDate  
+      ,CAST(VW_PatientPharmacy.VisitDate AS DATE) AS VisitDate  
       --,[VisitType]
       ,VT.Name AS VisitType
       ,ptn_pharmacy_pk
@@ -90,6 +98,8 @@
   JOIN mst_Decode  VT ON VW_PatientPharmacy.ProgID = VT.ID
   JOIN mst_User ON VW_PatientPharmacy.DispensedBy = mst_User.UserID
   JOIN mst_Patient ON mst_Patient.Ptn_Pk = VW_PatientPharmacy.Ptn_pk
-  WHERE mst_Patient.PatientEnrollmentID IS NOT NULL
+  JOIN lnk_DrugStrength ON VW_PatientPharmacy.GenericID = lnk_DrugStrength.GenericID
+  JOIN mst_Strength ON lnk_DrugStrength.StrengthId = mst_Strength.StrengthId
+  WHERE PatientEnrollmentID IS NOT NULL
   
  ORDER BY Ptn_pk
