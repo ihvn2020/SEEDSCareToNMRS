@@ -1,0 +1,25 @@
+LabID
+Ptn_pk
+PatientEnrollmentID
+LocationID
+OrderedbyName
+OrderedbyDate
+ReportedbyName
+ReportedbyDate
+CheckedbyName
+ReportedbyDate
+PreClinicLabDate
+TestName
+TestID
+Test GroupId
+Test GroupName
+LabDepartmentID
+LabDepartmentName
+LabTypeID
+LabTypeName
+TestResults
+TestResults1
+TestResultId
+Parameter Result
+VisitDate
+LabPeriod

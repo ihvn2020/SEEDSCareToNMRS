@@ -17,11 +17,12 @@ require 'model/visitModel.php';
 
 //**********Dictionaries*********************//
 require 'dictionaries/clinicalDictionary.php';
+require 'dictionaries/labDictionary.php';
 
 
 // This is the main class that will be used to do the migration proper.
 // Several methods will be created here inorder to perform the migration.
-class seedcareToNMRS extends clinicalDictionary {
+class seedcareToNMRS extends clinicalDictionary{
 		private $facilityName = "";
 		private $datimId = "";
 		public $conn;
@@ -126,7 +127,7 @@ class seedcareToNMRS extends clinicalDictionary {
 								
 							foreach ($demographicsTables as $key => $dtable) {
 									$all_values = "";
-									$visitArray = array();
+									$visitArray = "";
 									$row = 1;
 
 									// Open up the file
@@ -140,8 +141,6 @@ class seedcareToNMRS extends clinicalDictionary {
 										
 										$currentMigration = "Migrating ".$dtable." :". $csvColumn[0]."<hr>";
 										// Count all the rows
-										
-										
 
 										// Escape / Ignore the first row becuase it contains headings 
 										// and we need the headings to be there so that the column count won't throw error
@@ -210,7 +209,6 @@ class seedcareToNMRS extends clinicalDictionary {
 												$obsvalDateTime = "";
 												$obsvalText = "";
 												$obsvalOthers = "";
-
 
 													$columns = obscolumns();
 													$obsrows = hivEnrollentConcepts($csvColumn);
@@ -291,6 +289,10 @@ class seedcareToNMRS extends clinicalDictionary {
 												//$escaped_values = implode(',', (seedcareFields($csvColumn)));
 												$values  = implode(",", call_user_func($seedcare_fields,$csvColumn,$row));
 
+												// To be kept in a text file (last)
+												$visitArray.=$csvColumn[0].','.$csvColumn[12].','.$csvColumn[41].','.$csvColumn[7]."\n";
+												// serialize your array and store in a Text File
+
 												if($row<$rows){
 													$all_values.= "(".$values."),";
 												}else{
@@ -301,6 +303,15 @@ class seedcareToNMRS extends clinicalDictionary {
 						
 													// Execute the MySQLI Query
 													$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
+
+													// To be kept in a text file (last)
+													$visitArray.=$csvColumn[0].','.$csvColumn[12].','.$csvColumn[41].','.$csvColumn[7];
+													// serialize your array and store in a Text File
+
+													
+
+													// save serialized data in a text file
+													file_put_contents('firstVisit.txt', $visitArray);
 												}
 
 												// Increment row count
@@ -308,9 +319,6 @@ class seedcareToNMRS extends clinicalDictionary {
 										
 												$nmrs_fields = 'nmrs'.$dtable.'Fields';
 												$seedcare_fields = 'seedcare'.$dtable.'Fields';
-
-												// To be kept in a text file
-												$visitArray.=array($csvColumn[0].','.$csvColumn[12].','.$csvColumn[41]).",";
 
 												// Get Columns from the arrays stored in each functions
 												$columns = implode(", ",call_user_func($nmrs_fields));
@@ -328,14 +336,6 @@ class seedcareToNMRS extends clinicalDictionary {
 						
 													// Execute the MySQLI Query
 													$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
-
-													// To be kept in a text file (last)
-													$visitArray=array_combine($visitArray,array($csvColumn[0].','.$csvColumn[12].','.$csvColumn[41]));
-													// serialize your array and store in a Text File
-														$serializedData = serialize($visitArray);
-
-														// save serialized data in a text file
-														file_put_contents('firstVisit.txt', $serializedData);
 												}
 
 												// Increment row count
@@ -506,7 +506,7 @@ class seedcareToNMRS extends clinicalDictionary {
 																	break;
 															}															
 															
-															echo $obsSQL1 = "INSERT INTO `$cltable` ($columns,value_numeric) VALUES $obsvalNumeric ON DUPLICATE KEY UPDATE voided=voided";
+															$obsSQL1 = "INSERT INTO `$cltable` ($columns,value_numeric) VALUES $obsvalNumeric ON DUPLICATE KEY UPDATE voided=voided";
 															$obsSQL2 = "INSERT INTO `$cltable` ($columns,value_coded) VALUES $obsvalCoded ON DUPLICATE KEY UPDATE voided=voided";
 															$obsSQL3 = "INSERT INTO `$cltable` ($columns,value_datetime) VALUES $obsvalDateTime ON DUPLICATE KEY UPDATE voided=voided";
 															$obsSQL4 = "INSERT INTO `$cltable` ($columns,value_text) VALUES $obsvalOthers ON DUPLICATE KEY UPDATE voided=voided";
@@ -587,23 +587,423 @@ class seedcareToNMRS extends clinicalDictionary {
 									}
 
 										
-							}
-							
+							}							
 							
 						break;
 
 						case 'Pharmacy':
+							$firstVisit = array();
+							$file = explode("\n", file_get_contents("firstVisit.txt"));
+							foreach ( $file as $content ) {
+								$firstVisit[] = array_filter(array_map("trim", explode(",", $content)));
+							}
+							
+							$pharmacyTables = array('obs','encounter','visit');
+								
+							foreach ($pharmacyTables as $key => $phtable) {
+									//Load the Drug Coding CSV Data									
+									$drugCoding = array_map('str_getcsv', file('assets/resources/drugcoding2.csv'));
 
+								
+									// List all the columns that will be used to generate obs data according to the CSV Uploaded
+
+									$all_values = "";
+									$row = 1;
+									
+									// Open up the file
+									$file = fopen($fileName, "r");
+									
+									$getfile = file($fileName);
+									$rows = count($getfile);
+
+									// Loop through the Uploaded CSV File
+									while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
+										
+										$currentMigration = "Migrating ".$phtable." :". $csvColumn[0]."<hr>";
+										// Count all the rows
+
+										// Escape / Ignore the first row becuase it contains headings 
+										// and we need the headings to be there so that the column count won't throw error
+										if($row == 1){ $row++; continue; }
+
+										// Log progress in the console and on screen;
+										// echo("<script>console.log('PHP: " . $currentMigration . "');</script>");						
+										
+											// Truncate and remove the contents of the existing tables
+											// mysqli_query($conn,"TRUNCATE $cltable") or die(mysqli_error($conn));
+											
+											if($phtable=='obs'){
+												// Get the OBS Columns from the obsModel.php
+												
+												$obsvalNumeric = "";
+												$obsvalCoded = "";
+												$obsvalDateTime = "";
+												$obsvalText = "";
+												$obsvalOthers = "";
+												$columns = obscolumns();
+
+													$obsrows = pharmacyConcepts($csvColumn,$firstVisit,$drugCoding);
+													$obsrowcount = count($obsrows);
+													$obsrowc = 1;
+													
+													foreach($obsrows as $obsrow){
+
+														if($obsrow['conceptAns']!=""){
+															$answer = $obsrow['conceptAns'];
+														}else{
+															$answer = $obsrow['csvcol'];
+														}
+
+														$values="'".$csvColumn[0]."',"
+								 						."'".$obsrow['conceptID']."',"
+														."'".$csvColumn[2]."',"
+														."'".$csvColumn[2]."',"
+														."'".$this->nmrsDateTime($csvColumn[5])."',"
+														."'".$csvColumn[1]."',"
+														."'".$this->getObsGroupID($csvColumn[0])."',"
+														."'".$csvColumn[2]."',1,"
+														."'".$this->nmrsDateTime($csvColumn[5])."',0,"
+														."'".bin2hex(random_bytes(6))."','Pharmacy Form',"
+														."'".$answer."'";
+
+														switch ($obsrow['dataType']){
+															case "value_numeric":																	
+																$obsvalNumeric.="(".$values."),";
+																break;
+
+															case "value_coded":																	
+																$obsvalCoded.="(".$values."),";
+																break;
+
+															case "value_datetime":																	
+																$obsvalDateTime.="(".$values."),";
+																break;
+															
+															case "value_text":																	
+																$obsvalText.="(".$values."),";
+																break;
+
+															default:																	
+																$obsvalOthers.="(".$values."),";
+																break;
+														}
+
+														// Check the End of OBS Rows
+
+														if(($row*$obsrowc)==($rows*$obsrowcount)){
+															$this->checkQuery($phtable,$conn,$obsvalCoded,'value_coded',$columns);
+															$this->checkQuery($phtable,$conn,$obsvalNumeric,'value_numeric',$columns);
+															$this->checkQuery($phtable,$conn,$obsvalDateTime,'value_datetime',$columns);
+															$this->checkQuery($phtable,$conn,$obsvalText,'value_text',$columns);
+															$this->checkQuery($phtable,$conn,$obsvalOthers,'value_text',$columns);
+														}
+
+														$obsrowc++;									
+
+													
+													}
+											
+
+											}elseif($phtable=='encounter'){
+												$nmrs_fields = 'nmrs'.$phtable.'Fields';
+												$seedcare_fields = 'seedcare'.$phtable.'Fields';
+
+												// Get Columns from the arrays stored in each functions
+												$columns = implode(", ",call_user_func($nmrs_fields));
+
+												//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+												$values  = implode(",", call_user_func($seedcare_fields,$csvColumn,$row));
+
+												if($row<$rows){
+													$all_values.= "(".$values."),";
+												}else{
+						
+													// If the Last row is reach then write the sql
+													$all_values.= "(".$values.")";
+													$clinicalsSQL = "INSERT INTO `$phtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+						
+													// Execute the MySQLI Query
+													$result = mysqli_query($conn, $clinicalsSQL) or die(mysqli_error($conn));
+												}
+											}else{
+
+											
+												$nmrs_fields = 'nmrs'.$phtable.'Fields';
+												$seedcare_fields = 'seedcare'.$phtable.'Fields';
+
+												// Get Columns from the arrays stored in each functions
+												$columns = implode(", ",call_user_func($nmrs_fields));
+
+												//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+												$values  = implode(",", call_user_func($seedcare_fields,$csvColumn));
+
+												if($row<$rows){
+													$all_values.= "(".$values."),";
+												}else{
+						
+													// If the Last row is reach then write the sql
+													$all_values.= "(".$values.")";
+													$clinicalsSQL = "INSERT INTO `$phtable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+						
+													// Execute the MySQLI Query
+													$result = mysqli_query($conn, $clinicalsSQL) or die(mysqli_error($conn));
+												}
+
+												// Increment row count
+											}
+										$row++;
+										$currentMigration="";											
+									}
+																													
+									// Check if we have reached the last row (because it helps to right just one insert query)
+									// if not continue building up data to be uploaded once (helps to optimise)								
+										
+									if (!empty($result)) {
+										echo "<div class='alert alert-success'> $phtable's CSV Data has been Imported into the Database</div>";
+									} else {
+										echo "<div class='alert alert-danger'>Problem in Importing $phtable's  CSV Data</div>";
+									}
+
+										
+							}			
+							
 						break;
 
 						case 'Lab':
+							$firstVisit = array();
+							$file = explode("\n", file_get_contents("firstVisit.txt"));
+							foreach ( $file as $content ) {
+								$firstVisit[] = array_filter(array_map("trim", explode(",", $content)));
+							}
+
+							//Load the Clinical CSV Data
+							$labCSV = array_map('str_getcsv', file('assets/resources/labcoding.csv'));
+							
+							$labTables = array('obs','encounter','visit');
+								
+							foreach ($labTables as $key => $ltable) {
+								
+								// List all the columns that will be used to generate obs data according to the CSV Uploaded
+
+								$all_values = "";
+								$row = 1;
+								
+								// Open up the file
+								$file = fopen($fileName, "r");
+								
+								$getfile = file($fileName);
+								$rows = count($getfile);
+
+								// Loop through the Uploaded CSV File
+								while (($csvColumn = fgetcsv($file, 10000, ",")) !== FALSE) {
+									
+									$currentMigration = "Migrating ".$ltable." :". $csvColumn[0]."<hr>";
+									// Count all the rows
+
+									// Escape / Ignore the first row becuase it contains headings 
+									// and we need the headings to be there so that the column count won't throw error
+									if($row == 1){ $row++; continue; }
+
+									// Log progress in the console and on screen;
+									// echo("<script>console.log('PHP: " . $currentMigration . "');</script>");
+									/*
+									while (true) {
+										// Echo an extra line, and flush the buffers
+										// to ensure it gets displayed.
+										echo ' .';
+										flush();
+										ob_flush();
+									
+										// Now sleep for 1 second and check again (Not used yet):
+											// Progress Bar Code may be changed to Javascript
+										// sleep(1);
+									}
+									
+									*/
+									
+
+										// Truncate and remove the contents of the existing tables
+										// mysqli_query($conn,"TRUNCATE $cltable") or die(mysqli_error($conn));
+
+										
+										if($ltable=='obs'){
+											// Get the OBS Columns from the obsModel.php
+											
+											$ocount = 1;
+											$obsvalNumeric = "";
+											$obsvalCoded = "";
+											$obsvalDateTime = "";
+											$obsvalOthers = "";
+											$obsvalText = "";
+
+											
+												// $columns = $obscolumns.",".obsValueType($csvColumn,$obsrow);
+												$columns = obscolumns();
+												//Check if OBS Row is NULL
+												if($csvColumn[14]=="NULL" || $csvColumn[14]==""){
+													if($row!=$rows){
+													$row++;
+													continue;
+												}else{														
+													$this->checkQuery($ltable,$conn,$obsvalNumeric,'value_numeric',$columns);
+													$this->checkQuery($ltable,$conn,$obsvalCoded,'value_coded',$columns);
+													$this->checkQuery($ltable,$conn,$obsvalDateTime,'value_datetime',$columns);
+													$this->checkQuery($ltable,$conn,$obsvalOthers,'value_text',$columns);
+													}
+										
+												}else{
+													$dictionary = new labDictionary;
+													
+													$values="'".$csvColumn[0]."',"
+													 ."'".$dictionary->getCID($labCSV,$csvColumn[14])."',"
+													."'".$csvColumn[2]."',"
+													."'".$csvColumn[2]."',"
+													."'".$this->nmrsDateTime($csvColumn[9])."',"
+													."'".$csvColumn[1]."',"
+													."'".$this->getObsGroupID($obsrow)."',"
+													."'".$csvColumn[2]."',1,"														
+													."'".$this->nmrsDateTime($csvColumn[9])."',0,"
+													."'".bin2hex(random_bytes(6))."','Care Card Form',"
+													."'".$dictionary->getAns($labCSV,14,$csvColumn[14],$csvColumn[19])."'";
+
+													/*  Check Answe Returned
+													if($dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow])!=''){
+														echo "Answer: ". $dictionary->getAns($clinicalCSV,$obsrow,$csvColumn[$obsrow]);
+													}
+													*/
+
+													if(($row*$ocount)<($rows*$countObsFields)){															
+
+														switch (obsValueTypeLab($labCSV,$csvColumn[14])){
+															case "value_numeric":																	
+																$obsvalNumeric.="(".$values."),";
+																break;
+
+															case "value_coded":																	
+																$obsvalCoded.="(".$values."),";
+																break;
+
+															case "value_datetime":																	
+																$obsvalDateTime.="(".$values."),";
+																break;
+
+															default:																	
+																$obsvalOthers.="(".$values."),";
+																break;
+														}
+														
+													}else{
+							
+														// If the Last row is reach then write the sql
+														// $all_values.= "(".$values.")";
+
+														switch (obsValueTypeLab($labCSV,$obsrow)){
+															case "value_numeric":																	
+																$obsvalNumeric.="(".$values.")";
+																break;
+
+															case "value_coded":																	
+																$obsvalCoded.="(".$values.")";
+																break;
+
+															case "value_datetime":																	
+																$obsvalDateTime.="(".$values.")";
+																break;
+
+															default:																	
+																$obsvalOthers.="(".$values.")";
+																break;
+														}															
+														
+														$obsSQL1 = "INSERT INTO `$ltable` ($columns,value_numeric) VALUES $obsvalNumeric ON DUPLICATE KEY UPDATE voided=voided";
+														$obsSQL2 = "INSERT INTO `$ltable` ($columns,value_coded) VALUES $obsvalCoded ON DUPLICATE KEY UPDATE voided=voided";
+														$obsSQL3 = "INSERT INTO `$ltable` ($columns,value_datetime) VALUES $obsvalDateTime ON DUPLICATE KEY UPDATE voided=voided";
+														$obsSQL4 = "INSERT INTO `$ltable` ($columns,value_text) VALUES $obsvalOthers ON DUPLICATE KEY UPDATE voided=voided";
+																						
+														// Execute the MySQLI Query
+														$result1 = mysqli_query($conn, $obsSQL1) or die(mysqli_error($conn));
+														$result2 = mysqli_query($conn, $obsSQL2) or die(mysqli_error($conn));
+														$result3 = mysqli_query($conn, $obsSQL3) or die(mysqli_error($conn));
+														$result4 = mysqli_query($conn, $obsSQL4) or die(mysqli_error($conn));
+														
+													}														
+													$ocount++;
+												}				
+											
+										
+
+										}elseif($ltable=='encounter'){
+											$nmrs_fields = 'nmrs'.$ltable.'Fields';
+											$seedcare_fields = 'seedcare'.$ltable.'Fields';
+
+											// Get Columns from the arrays stored in each functions
+											$columns = implode(", ",call_user_func($nmrs_fields));
+
+											//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+											$values  = implode(",", call_user_func($seedcare_fields,$csvColumn,$row));
+
+											if($row<$rows){
+												$all_values.= "(".$values."),";
+											}else{
+					
+												// If the Last row is reach then write the sql
+												$all_values.= "(".$values.")";
+												$clinicalsSQL = "INSERT INTO `$ltable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+					
+												// Execute the MySQLI Query
+												$result = mysqli_query($conn, $clinicalsSQL) or die(mysqli_error($conn));
+											}
+										}else{
+
+										
+											$nmrs_fields = 'nmrs'.$ltable.'Fields';
+											$seedcare_fields = 'seedcare'.$ltable.'Fields';
+
+											// Get Columns from the arrays stored in each functions
+											$columns = implode(", ",call_user_func($nmrs_fields));
+
+											//$escaped_values = implode(',', (seedcareFields($csvColumn)));
+											$values  = implode(",", call_user_func($seedcare_fields,$csvColumn));
+
+											if($row<$rows){
+												$all_values.= "(".$values."),";
+											}else{
+					
+												// If the Last row is reach then write the sql
+												$all_values.= "(".$values.")";
+												$clinicalsSQL = "INSERT INTO `$ltable`($columns) VALUES $all_values ON DUPLICATE KEY UPDATE voided=voided";
+					
+												// Execute the MySQLI Query
+												$result = mysqli_query($conn, $clinicalsSQL) or die(mysqli_error($conn));
+											}
+
+											// Increment row count
+										}
+									$row++;
+									$currentMigration="";
+										
+								}
+																		
+									
+								// Check if we have reached the last row (because it helps to right just one insert query)
+								// if not continue building up data to be uploaded once (helps to optimise)
+									
+									
+								if (!empty($result)) {
+									echo "<div class='alert alert-success'> $cltable's CSV Data has been Imported into the Database</div>";
+								} else {
+									echo "<div class='alert alert-danger'>Problem in Importing CSV Data</div>";
+								}
+
+									
+						}	
 						break;
 
 						case 'Users':
 						break;
 
 						default:
-						echo "Please select a data category from the list";
+						echo "<div class='alert alert-danger'>Please select a data category from the list</div>";
 						break; 
 
 					}
@@ -613,6 +1013,8 @@ class seedcareToNMRS extends clinicalDictionary {
 					mysqli_query($conn,"SET FOREIGN_KEY_CHECKS = 1");
 
 			
+				}else{
+					echo "<div class='alert alert-danger'>Please select a CSV file to upload<hr><a href='javascript:history.back()' class='btn btn-success'>Go Back</a></a></div>";
 				}
 			}
 		

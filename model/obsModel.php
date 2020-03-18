@@ -198,14 +198,13 @@ function getVisitType($csvColumn,$firstVisit){
             return 164180;
         }
 }
-function getPregnancyStatus($csvColumn,$firstVisit){
-
+function getPregnancyStatus($csvColumn,$firstVisit){    
     // Get First Visit Array   
 														
     // $firstVisitTxt = file_get_contents('firstVisit.txt');													
     // $firstVisit = unserialize($firstVisitTxt);
 
-    if($firstVisit[$csvColumn[0]][2]!='NULL'){
+    if(isset($firstVisit[$csvColumn[0]]) && $firstVisit[$csvColumn[0]][2]!='NULL'){
         return 165047;
     }else{
         return 165048;
@@ -223,9 +222,11 @@ function getPickupReason($csvColumn,$firstVisit){
 
 function getAgeGroup($csvColumn,$firstVisit){
     if(isset($firstVisit[$csvColumn[0]][3])){
+        // echo $csvColumn[0];
+        $firstVisit[$csvColumn[0]][3];
 
-        $d1 = new DateTime(strtotime($firstVisit[$csvColumn[0]][3]));
-        $d2 = new DateTime(strtotime($csvColumn[5]));
+        $d1 = DateTime::createFromFormat('d/m/Y',$firstVisit[$csvColumn[0]][3]);
+        $d2 = DateTime::createFromFormat('d/m/Y',$csvColumn[5]);
 
         $diff = $d2->diff($d1);
 
@@ -259,7 +260,40 @@ function getRegimenLine($csvColumn,$firstVisit){
         break;
     }
 }
-function pharmacyConcepts($csvColumn,$firstVisit){
+
+function getARVRegimen($csvColumn,$drugCoding){
+    //$csvColumn[15]; // Drugname
+
+    foreach($drugCoding as $line){
+        if($line[2] != $csvColumn[15]){
+            continue;
+        }else if($line[3] == $csvColumn[15]){      
+            return $line[11];
+        break;
+        }else {
+            return "";
+        }
+    }
+
+}
+
+function ARVMedication($csvColumn,$drugCoding){
+    //$csvColumn[15]; // Drugname
+
+    foreach($drugCoding as $line){
+        if($line[2] != $csvColumn[15]){
+            continue;
+        }else if($line[3] == $csvColumn[15]){      
+            return $line[11];
+        break;
+        }else {
+            return "";
+        }
+    }
+
+}
+
+function pharmacyConcepts($csvColumn,$firstVisit,$drugCoding){
     // Used in populating pharmacy order form
     $pharmConcepts = array(
         // Treatment Type
@@ -311,15 +345,27 @@ function pharmacyConcepts($csvColumn,$firstVisit){
 
         // ARV Regimen **Under Construction ***
         array(
-            "conceptID" => getARVConcep($csvColumn,$firstVisit),
+            "conceptID" => getRegimenLine($csvColumn,$firstVisit),
             "dataType" => "value_coded",
-            "conceptAns" => getRegimenLine($csvColumn,$firstVisit),
+            "conceptAns" => getARVRegimen($csvColumn,$drugCoding),
             "csvcol" => ""
         ),
 
-        
+         // ARV Medication
+         array(
+            "conceptID" => getRegimenLine($csvColumn,$firstVisit),
+            "dataType" => "value_coded",
+            "conceptAns" => ARVMedication($csvColumn,$drugCoding),
+            "csvcol" => ""
+        ),
 
-        
+        // Ordered Date
+        array(
+            "conceptID" => 164989,
+            "dataType" => "value_datetime",
+            "conceptAns" => $csvColumn[5],
+            "csvcol" => ""
+        )
         
       );
 

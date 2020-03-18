@@ -33,41 +33,38 @@
 class labDictionary{
     
     /* Get the Clinic CSV Record and Store in variable;
-    public function clinicalCSV(){        
-        $clinicalCSV = array_map('str_getcsv', file('/assets/resources/clinicalcsv.csv'));
-        return $clinicalCSV;
+    public function labCSV(){        
+        $labCSV = array_map('str_getcsv', file('/assets/resources/labCSV.csv'));
+        return $labCSV;
     }
     */
 
     // Get Concept ID of current column or variable name
     function getCID($labCSV,$variablePosition){
             //Get the Clinical CSV Data
-            // $clinicalCSV = $clinicalCSV();
+            // $labCSV = $labCSV();
             
-            foreach($clinicalCSV as $line){
-                if($line[1] != $variablePosition){
+            foreach($labCSV as $line){
+                if($line[2] != $variablePosition){
                     continue;
-                }else if($line[1] == $variablePosition){
-                break;
-                    return $line[6];
+                }else if($line[2] == $variablePosition){
+                    return $line[5];
                 }else{
                     return "";
                 }
             }
     }
 
-    // Get ConceptID Answers for value Coded Answers
-    function getAns($clinicalCSV,$variablePosition,$rawAnswer){
+    // Get Any type of Answers
+    function getAns($labCSV,$variablePosition,$rawAnswer){
 
-        foreach($clinicalCSV as $line){
-            if($line[1] != $variablePosition){
+        foreach($labCSV as $line){
+            if($line[2] != $variablePosition){
                 continue;
-            }else if($line[1] == $variablePosition && $line[4]=="numeric"){
-            break;
-                return $csvColumn[$variablePosition];
-            }else if($line[1] == $variablePosition && $line[5]==$rawAnswer){
-            break;
-                return $line[6];
+            }else if($line[2] == $variablePosition && $line[3]=="+/-"){           
+                return $line[8]; // Or $line[7];
+            }else if($line[2] == $variablePosition && $line[3]!="+/-"){            
+                return $rawAnswer;
             }else{
                 return "";
             }
@@ -77,11 +74,10 @@ class labDictionary{
     // Get ConceptID Answers for value Coded Answers
     function getCIDAns($variableName,$rawAnswer){
 
-        foreach($clinicalCSV as $line){
+        foreach($labCSV as $line){
             if($line[1] != $variableName){
                 continue;
             }else if($line[1] == $variableName && $line[4]==$rawAnswer){
-            break;
                 return $line[5];
             }else{
                 return "";
@@ -92,11 +88,10 @@ class labDictionary{
     // Get ConceptID Answers for value Coded Answers
     function getNumericAns($variableName){
 
-        foreach($clinicalCSV as $line){
+        foreach($labCSV as $line){
             if($line[1] != $variableName){
                 continue;
-            }else if($line[1] == $variableName){
-            break;
+            }else if($line[1] == $variableName){           
                 return $line[5];
             }else{
                 return "";

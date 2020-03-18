@@ -30,22 +30,38 @@ function getEncounterID($csvColumn,$row){
         return $row;
     }
 }
+
 //Column Names in Seed Care
 function seedcareencounterFields($csvColumn,$row){
-    $seedcareencounterColumns = array(
-        getEncounterID($csvColumn[2],$row), // Encounter ID
-        5,
-        $csvColumn[0], // Patient ID
-        $csvColumn[1], // Location ID
-        5,        
-        "'".date("Y-m-d", strtotime($csvColumn[12]))."'",
-        "'".$csvColumn[11]."'", // Creator 
-        "'".date("Y-m-d", strtotime($csvColumn[12]))."'",        
-        0, // Voided
-        $csvColumn[0], // Visit ID       
-        "'".bin2hex(random_bytes(6))."'"
-    );
-
+    if(is_int($csvColumn[1])){
+        $seedcareencounterColumns = array(
+            getEncounterID($csvColumn[2],$row), // Encounter ID
+            5,
+            $csvColumn[0], // Patient ID
+            $csvColumn[1], // Location ID
+            5,        
+            "'".date("Y-m-d", strtotime($csvColumn[12]))."'",
+            "'".$csvColumn[11]."'", // Creator 
+            "'".date("Y-m-d", strtotime($csvColumn[12]))."'",        
+            0, // Voided
+            $csvColumn[0], // Visit ID       
+            "'".bin2hex(random_bytes(6))."'"
+        );
+    }else{
+        $seedcareencounterColumns = array(
+            getEncounterID($csvColumn[2],$row), // Encounter ID
+            13,
+            $csvColumn[0], // Patient ID
+            $csvColumn[3], // Location ID
+            27,        
+            "'".date("Y-m-d", strtotime($csvColumn[5]))."'",
+            1, // Creator 
+            "'".date("Y-m-d", strtotime($csvColumn[5]))."'",        
+            0, // Voided
+            $csvColumn[0], // Visit ID       
+            "'".bin2hex(random_bytes(6))."'"
+        );
+    }   
     return $seedcareencounterColumns;
         
 }
