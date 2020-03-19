@@ -14,6 +14,20 @@ function obsValueType($clinicalCSV,$obsrow){
 
 }
 
+function obsValueTypeLab($labCSV,$obsrow){
+
+    foreach($labCSV as $line){
+       if($line[2] != $obsrow){
+           continue;
+       }else if($line[2] == $obsrow){      
+           return $line[9];
+       }else {
+           return "value_text";
+       }
+   }
+ 
+ }
+
 //List of OBS Columns that will be impacted by Seedcare Data
 
 function obscolumns(){

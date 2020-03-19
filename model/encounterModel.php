@@ -23,19 +23,25 @@ function nmrsencounterFields(){
         
 }
 
-function getEncounterID($csvColumn,$row){
-    if(is_int($csvColumn)){
-        return $csvColumn[2];
-    }else{
-        return $row;
-    }
-}
-
 //Column Names in Seed Care
-function seedcareencounterFields($csvColumn,$row){
-    if(is_int($csvColumn[1])){
+function seedcareencounterFields($csvColumn,$row,$data_category){
+    if($data_category=='Lab'){
+        $encounterID = $csvColumn[0];
+        $formid = 21;
+    }elseif($data_category=="Demographics"){
+        $encounterID = $csvColumn[2];
+        $formid = 27;
+    }elseif($data_category=="Pharmacy"){
+        $encounterID = $csvColumn[28];
+        $formid = 27;
+    }else{
+        $encounterID = $csvColumn[2];
+        $formid = 14;
+    }
+
+
         $seedcareencounterColumns = array(
-            getEncounterID($csvColumn[2],$row), // Encounter ID
+            $encounterID, // Encounter ID
             5,
             $csvColumn[0], // Patient ID
             $csvColumn[1], // Location ID
@@ -47,21 +53,7 @@ function seedcareencounterFields($csvColumn,$row){
             $csvColumn[0], // Visit ID       
             "'".bin2hex(random_bytes(6))."'"
         );
-    }else{
-        $seedcareencounterColumns = array(
-            getEncounterID($csvColumn[2],$row), // Encounter ID
-            13,
-            $csvColumn[0], // Patient ID
-            $csvColumn[3], // Location ID
-            27,        
-            "'".date("Y-m-d", strtotime($csvColumn[5]))."'",
-            1, // Creator 
-            "'".date("Y-m-d", strtotime($csvColumn[5]))."'",        
-            0, // Voided
-            $csvColumn[0], // Visit ID       
-            "'".bin2hex(random_bytes(6))."'"
-        );
-    }   
+    
     return $seedcareencounterColumns;
         
 }

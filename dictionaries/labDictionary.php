@@ -41,7 +41,7 @@ class labDictionary{
 
     // Get Concept ID of current column or variable name
     function getCID($labCSV,$variablePosition){
-            //Get the Clinical CSV Data
+            //Get the Lab CSV Data
             // $labCSV = $labCSV();
             
             foreach($labCSV as $line){
