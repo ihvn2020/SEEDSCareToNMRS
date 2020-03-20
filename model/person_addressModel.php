@@ -6,9 +6,9 @@ function nmrsperson_addressFields(){
         'person_address_id', // Ptn_Pk
         'person_id', // Ptn_Pk
         'address1', // Address
-        'city_village', // Firstname
-        'state_province', // Middlename
-        'country', //Lastname      
+        'city_village', // 
+        'state_province', // 
+        'country', //      
         'voided', // Delete Flag
         'creator',
         'uuid'
@@ -24,12 +24,12 @@ function seedcareperson_addressFields($csvColumn){
         $csvColumn[0], // Ptn_Pk
         $csvColumn[0], // Ptn_Pk
         $csvColumn[35], // Address
-        "'".$csvColumn[10]."'", // VillageName
-        $csvColumn[9], // LocalCouncil
-        $csvColumn[22], // CountryId
+        "'".$csvColumn[9]." ".$csvColumn[10]." ".$csvColumn[11]."'", // VillageName
+        $csvColumn[12], // Province
+        $csvColumn[27], // CountryId
         $csvColumn[22], // DeleteFlag
         1, // $csvColumn[23], // Supposed to be userID but is null
-        "'".bin2hex(random_bytes(6))."'"
+        "'".bin2hex(random_bytes(18))."'"
     );
 
     return $seedcareperson_addressColumns;

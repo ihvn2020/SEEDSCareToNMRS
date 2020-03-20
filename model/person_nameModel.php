@@ -26,10 +26,10 @@ function seedcareperson_nameFields($csvColumn){
         "'".$csvColumn[33]."'", // Firstname
         "'".$csvColumn[30]."'", // Middlename
         "'".$csvColumn[34]."'", // Lastname
-        $csvColumn[22], // DeleteFlag
         "'".date("Y-m-d", strtotime($csvColumn[24]))."'",
+        $csvColumn[22], // DeleteFlag        
         1, // $csvColumn[23], // Supposed to be userID but is null
-        "'".bin2hex(random_bytes(6))."'"
+        "'".bin2hex(random_bytes(18))."'"
     );
 
     return $seedcareperson_nameColumns;

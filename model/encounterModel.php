@@ -1,8 +1,5 @@
 <?php
 
-
-
-
 // Column names in NMRS Patient Table
 function nmrsencounterFields(){
     $nmrsencounterColumns = array(
@@ -27,31 +24,59 @@ function nmrsencounterFields(){
 function seedcareencounterFields($csvColumn,$row,$data_category){
     if($data_category=='Lab'){
         $encounterID = $csvColumn[0];
-        $formid = 21;
+        $formid = 19; // Laboratory Order and Result Form (Need Verification)
+        $encounterTypeID = 5;
+        $locationid = $csvColumn[1]; 
+        $encounterdate = date("Y-m-d", strtotime($csvColumn[26]));
+        $voided = $csvColumn[22];
+        $visitid = $csvColumn[0]; 
+        $patientid = $csvColumn[0];      
     }elseif($data_category=="Demographics"){
-        $encounterID = $csvColumn[2];
-        $formid = 27;
+        $encounterID = $csvColumn[0];
+        $formid = 21; // HIV Enrollment Form (Need Verification)
+        $encounterTypeID = 14;
+        $locationid = $csvColumn[1];
+        $encounterdate = date("Y-m-d", strtotime($csvColumn[26]));
+        $voided = $csvColumn[22];
+        $visitid = $csvColumn[0];
+        $patientid = $csvColumn[0];
     }elseif($data_category=="Pharmacy"){
         $encounterID = $csvColumn[28];
-        $formid = 27;
+        $formid = 25; // Pharmacy Order Form (Need Verification)
+        $encounterTypeID = 5;
+        $locationid = $csvColumn[1];
+        $encounterdate = date("Y-m-d", strtotime($csvColumn[26]));
+        $voided = $csvColumn[22];
+        $visitid = $csvColumn[0];
+        $patientid = $csvColumn[0];
     }else{
         $encounterID = $csvColumn[2];
-        $formid = 14;
+        $formid = 12; // Care card form
+        $encounterTypeID = 5;
+        $locationid = $csvColumn[1];
+        $encounterdate = date("Y-m-d", strtotime($csvColumn[26]));
+        $voided = $csvColumn[22];
+        $visitid = $csvColumn[0];
+        $patientid = $csvColumn[0];
     }
+
+    //******************IMPORTANT****************//
+    // Need to generate Adult Initial Clinical Evaluation
+    // And Ped Initial Clinical Evalutation
 
 
         $seedcareencounterColumns = array(
             $encounterID, // Encounter ID
-            5,
-            $csvColumn[0], // Patient ID
-            $csvColumn[1], // Location ID
-            5,        
-            "'".date("Y-m-d", strtotime($csvColumn[12]))."'",
-            "'".$csvColumn[11]."'", // Creator 
-            "'".date("Y-m-d", strtotime($csvColumn[12]))."'",        
-            0, // Voided
-            $csvColumn[0], // Visit ID       
-            "'".bin2hex(random_bytes(6))."'"
+            $encounterTypeID,
+            $patientid, // Patient ID
+            $locationid, // Location ID
+            $formid,        
+            "'".$encounterdate."'",
+            1, // Creator 
+            "'".$encounterdate."'",        
+            $voided, // Voided
+            $visitid, // Visit ID       
+            "'".bin2hex(random_bytes(18))."'"
         );
     
     return $seedcareencounterColumns;
