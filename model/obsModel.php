@@ -276,7 +276,7 @@ function getARVRegimen($csvColumn,$drugCoding){
     foreach($drugCoding as $line){
         if($line[2] != $csvColumn[15]){
             continue;
-        }else if($line[3] == $csvColumn[15]){      
+        }else if($line[2] == $csvColumn[15]){      
             return $line[11];
         break;
         }else {
@@ -290,9 +290,9 @@ function ARVMedication($csvColumn,$drugCoding){
     //$csvColumn[15]; // Drugname
 
     foreach($drugCoding as $line){
-        if($line[2] != $csvColumn[15]){
+       if($line[2] != $csvColumn[17]){
             continue;
-        }else if($line[3] == $csvColumn[15]){      
+        }else if($line[2] == $csvColumn[17] && $line[3]==$csvColumn[19]){      
             return $line[11];
         break;
         }else {

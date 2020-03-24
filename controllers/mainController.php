@@ -16,7 +16,7 @@ require 'model/encounterModel.php';
 require 'model/visitModel.php';
 
 //***********Users Models*********************//
-require 'model/users.php';
+require 'model/usersModel.php';
 
 //**********Dictionaries**********************//
 require 'dictionaries/clinicalDictionary.php';
@@ -284,7 +284,7 @@ class seedcareToNMRS extends clinicalDictionary{
 													$result = mysqli_query($conn, $demographicsSQL) or die(mysqli_error($conn));
 
 													// To be kept in a text file (last)
-													$visitArray.=$csvColumn[0].','.$csvColumn[12].','.$csvColumn[41].','.$csvColumn[7];
+													$visitArray.=$csvColumn[0].','.$csvColumn[26].','.$csvColumn[41].','.$csvColumn[7];
 													
 													// save serialized data in a text file
 													file_put_contents('firstVisit.txt', $visitArray);
