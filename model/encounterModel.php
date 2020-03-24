@@ -49,14 +49,14 @@ function seedcareencounterFields($csvColumn,$row,$data_category){
         $voided = $csvColumn[22];
         $visitid = $csvColumn[0];
         $patientid = $csvColumn[0];
-    }else{
+    }else{ // Clinicals
         $encounterID = $csvColumn[2];
-        $formid = 12; // Care card form
+        $formid = 12; // Care card form / Clinicals Encounter // (Need Verification)
         $encounterTypeID = 5;
         $locationid = $csvColumn[1];
-        $encounterdate = date("Y-m-d", strtotime($csvColumn[26]));
-        $voided = $csvColumn[22];
-        $visitid = $csvColumn[0];
+        $encounterdate = date("Y-m-d", strtotime($csvColumn[12]));
+        $voided = 0;
+        $visitid = $csvColumn[2];
         $patientid = $csvColumn[0];
     }
 

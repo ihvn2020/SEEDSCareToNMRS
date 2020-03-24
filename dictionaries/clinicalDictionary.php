@@ -45,9 +45,9 @@ class clinicalDictionary{
             // $clinicalCSV = $clinicalCSV();
             
             foreach($clinicalCSV as $line){
-                if($line[1] != $variablePosition){
+                if($line[2] != $variablePosition){
                     continue;
-                }else if($line[1] == $variablePosition){
+                }else if($line[2] == $variablePosition){
                     return $line[5];
                 }else{
                     return "";
@@ -59,11 +59,11 @@ class clinicalDictionary{
     function getAns($clinicalCSV,$variablePosition,$rawAnswer){
 
         foreach($clinicalCSV as $line){
-            if($line[1] != $variablePosition){
+            if($line[2] != $variablePosition){
                 continue;
-            }else if($line[1] == $variablePosition && $line[3]=="value_numeric"){           
+            }else if($line[2] == $variablePosition && $line[3]=="value_numeric"){           
                 return $rawAnswer;
-            }else if($line[1] == $variablePosition && $line[4]==$rawAnswer){            
+            }else if($line[2] == $variablePosition && $line[4]==$rawAnswer){            
                 return $line[6];
             }else{
                 return "";
@@ -75,9 +75,9 @@ class clinicalDictionary{
     function getCIDAns($variableName,$rawAnswer){
 
         foreach($clinicalCSV as $line){
-            if($line[1] != $variableName){
+            if($line[2] != $variableName){
                 continue;
-            }else if($line[1] == $variableName && $line[4]==$rawAnswer){
+            }else if($line[2] == $variableName && $line[4]==$rawAnswer){
                 return $line[5];
             }else{
                 return "";
@@ -89,9 +89,9 @@ class clinicalDictionary{
     function getNumericAns($variableName){
 
         foreach($clinicalCSV as $line){
-            if($line[1] != $variableName){
+            if($line[2] != $variableName){
                 continue;
-            }else if($line[1] == $variableName){           
+            }else if($line[2] == $variableName){           
                 return $line[5];
             }else{
                 return "";

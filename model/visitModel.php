@@ -51,7 +51,7 @@ function seedcarevisitFields($csvColumn,$data_category){
         $datestopped = $csvColumn[12]; 
         $locationid = $csvColumn[1];
         $patientid = $csvColumn[0]; 
-        $voided = $csvColumn[22];
+        $voided = 0;
     }
    
         $seedcarevisitColumns = array(

@@ -3,9 +3,9 @@
 function obsValueType($clinicalCSV,$obsrow){
 
    foreach($clinicalCSV as $line){
-      if($line[1] != $obsrow){
+      if($line[2] != $obsrow){
           continue;
-      }else if($line[1] == $obsrow){      
+      }else if($line[2] == $obsrow){      
           return $line[3];
       }else {
           return "value_text";
@@ -213,11 +213,6 @@ function getVisitType($csvColumn,$firstVisit){
         }
 }
 function getPregnancyStatus($csvColumn,$firstVisit){    
-    // Get First Visit Array   
-														
-    // $firstVisitTxt = file_get_contents('firstVisit.txt');													
-    // $firstVisit = unserialize($firstVisitTxt);
-
     if(isset($firstVisit[$csvColumn[0]]) && $firstVisit[$csvColumn[0]][2]!='NULL'){
         return 165047;
     }else{
