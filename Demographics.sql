@@ -4,10 +4,10 @@ GO
 Open symmetric key Key_CTC decryption by password='ttwbvXWpqb5WOLfLrBgisw=='
 
 	  
-	  SELECT  TOP 200 
+	  SELECT
 	   PatientEnrollmentID
-      ,LocationID
-      ,Ptn_Pk
+      ,mst_patient.LocationID
+      ,mst_patient.Ptn_Pk
       ,PatientClinicID
       ,ReferredFrom
       ,CAST(RegistrationDate AS DATE)AS RegistrationDate
@@ -22,7 +22,7 @@ Open symmetric key Key_CTC decryption by password='ttwbvXWpqb5WOLfLrBgisw=='
       ,EducationLevel
       ,EducationOther
       ,Literacy
-      ,EmployeeID
+      ,mst_patient.EmployeeID
       ,CASE Status
 		WHEN 0 THEN 'Active'
 		WHEN 1 THEN 'InActive'
@@ -60,9 +60,15 @@ Open symmetric key Key_CTC decryption by password='ttwbvXWpqb5WOLfLrBgisw=='
       ,CAST(DateTransferredin AS DATE)AS DateTransferredin
       ,NearestSchool
       ,NearestHealthCentre
+      ,EmergContactName
+      ,EmergContactRelation
+      ,EmergContactPhone
+      ,EmergContactAddress
   FROM mst_Patient
   LEFT JOIN mst_Decode ON mst_Decode.ID = mst_Patient.Sex 
   LEFT JOIN mst_Decode D ON D.ID = mst_Patient.MaritalStatus
- 
+  LEFT JOIN dtl_PatientContacts ON mst_Patient.Ptn_Pk = dtl_PatientContacts.ptn_pk
+  WHERE mst_Patient.PatientEnrollmentID IS NOT NULL 
+  
  
  
