@@ -68,7 +68,7 @@ Open symmetric key Key_CTC decryption by password='ttwbvXWpqb5WOLfLrBgisw=='
   LEFT JOIN mst_Decode ON mst_Decode.ID = mst_Patient.Sex 
   LEFT JOIN mst_Decode D ON D.ID = mst_Patient.MaritalStatus
   LEFT JOIN dtl_PatientContacts ON mst_Patient.Ptn_Pk = dtl_PatientContacts.ptn_pk
-  WHERE mst_Patient.PatientEnrollmentID IS NOT NULL 
+  WHERE mst_Patient.PatientEnrollmentID IS NOT NULL AND ARTStartDate IS NOT NULL
   
  
  
