@@ -1,10 +1,11 @@
   DECLARE @RegimenType varchar
   DECLARE @RegimenId INT
+  DECLARE @Strength varchar
   SET @RegimenId = NULL
   SET @RegimenType = NULL
+  SET @Strength = NULL 
 
-  --SELECT DISTINCT 
-  SELECT TOP 100 mst_Patient.PatientEnrollmentID
+  SELECT mst_Patient.PatientEnrollmentID
       ,VW_PatientPharmacyNonARV.Ptn_pk
       ,VisitID
       ,VW_PatientPharmacyNonARV.LocationID
@@ -29,7 +30,8 @@
       ,VW_PatientPharmacyNonARV.GenericID
       ,GenericName
       ,@RegimenType AS RegimenType
-      ,mst_Strength.StrengthName
+      --,mst_Strength.StrengthName
+      ,@Strength AS StrengthName
       ,@RegimenId AS RegimenId
       ,Duration
       ,OrderedQuantity
@@ -46,16 +48,14 @@
   JOIN mst_Decode  VT ON VW_PatientPharmacyNonARV.ProgID = VT.ID
   JOIN mst_User ON VW_PatientPharmacyNonARV.DispensedBy = mst_User.UserID
   JOIN mst_Patient ON mst_Patient.Ptn_Pk = VW_PatientPharmacyNonARV.Ptn_Pk
-  JOIN lnk_DrugStrength ON VW_PatientPharmacyNonARV.GenericID = lnk_DrugStrength.GenericID
-  JOIN mst_Strength ON lnk_DrugStrength.StrengthId = mst_Strength.StrengthId
-  WHERE mst_Patient.PatientEnrollmentID IS NOT NULL
+  --JOIN lnk_DrugStrength ON VW_PatientPharmacyNonARV.GenericID = lnk_DrugStrength.GenericID
+  --JOIN mst_Strength ON lnk_DrugStrength.StrengthId = mst_Strength.StrengthId
+  WHERE mst_Patient.PatientEnrollmentID IS NOT NULL and VW_PatientPharmacyNonARV.ProgID = 222
   
  
  UNION
   
-  
---SELECT DISTINCT 
-SELECT TOP 100 mst_Patient.PatientEnrollmentID
+SELECT mst_Patient.PatientEnrollmentID
 	  ,VW_PatientPharmacy.Ptn_pk
       ,VisitID
       ,VW_PatientPharmacy.LocationID
@@ -80,7 +80,8 @@ SELECT TOP 100 mst_Patient.PatientEnrollmentID
       ,VW_PatientPharmacy.GenericID
       ,GenericName
       ,RegimenType
-      ,mst_Strength.StrengthName
+      --,mst_Strength.StrengthName
+      ,@Strength AS StrengthName
       ,RegimenId 
       ,Duration
       ,OrderedQuantity
@@ -98,8 +99,8 @@ SELECT TOP 100 mst_Patient.PatientEnrollmentID
   JOIN mst_Decode  VT ON VW_PatientPharmacy.ProgID = VT.ID
   JOIN mst_User ON VW_PatientPharmacy.DispensedBy = mst_User.UserID
   JOIN mst_Patient ON mst_Patient.Ptn_Pk = VW_PatientPharmacy.Ptn_pk
-  JOIN lnk_DrugStrength ON VW_PatientPharmacy.GenericID = lnk_DrugStrength.GenericID
-  JOIN mst_Strength ON lnk_DrugStrength.StrengthId = mst_Strength.StrengthId
-  WHERE PatientEnrollmentID IS NOT NULL
+  --JOIN lnk_DrugStrength ON VW_PatientPharmacy.GenericID = lnk_DrugStrength.GenericID
+  --JOIN mst_Strength ON lnk_DrugStrength.StrengthId = mst_Strength.StrengthId
+  WHERE PatientEnrollmentID IS NOT NULL and VW_PatientPharmacy.ProgID = 222
   
  ORDER BY Ptn_pk
