@@ -57,17 +57,24 @@ class clinicalDictionary{
 
     // Get Any type of Answers
     function getAns($clinicalCSV,$variablePosition,$rawAnswer){
-
-        foreach($clinicalCSV as $line){
+     
+       
+        foreach($clinicalCSV as $line){            
+            
             if($line[2] != $variablePosition){
                 continue;
-            }else if($line[2] == $variablePosition && $line[3]=="value_numeric"){           
+            }else if($line[2]==$variablePosition && $line[3]=="value_numeric"){           
                 return $rawAnswer;
-            }else if($line[2] == $variablePosition && $line[4]==$rawAnswer){            
-                return $line[6];
+            }else if($line[2]==$variablePosition && $line[3]=="value_coded"){  
+                   
+                if($line[4]==$rawAnswer){                    
+                    return $line[6];
+                }       
+                
             }else{
                 return "";
             }
+            
         }
     }
     
@@ -78,7 +85,7 @@ class clinicalDictionary{
             if($line[2] != $variableName){
                 continue;
             }else if($line[2] == $variableName && $line[4]==$rawAnswer){
-                return $line[5];
+                return $line[6];
             }else{
                 return "";
             }

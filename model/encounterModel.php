@@ -23,38 +23,38 @@ function nmrsencounterFields(){
 //Column Names in Seed Care
 function seedcareencounterFields($csvColumn,$row,$data_category){
     if($data_category=='Lab'){
-        $encounterID = $csvColumn[0];
-        $formid = 19; // Laboratory Order and Result Form (Need Verification)
-        $encounterTypeID = 5;
-        $locationid = $csvColumn[1]; 
-        $encounterdate = date("Y-m-d", strtotime($csvColumn[26]));
-        $voided = $csvColumn[22];
-        $visitid = $csvColumn[0]; 
-        $patientid = $csvColumn[0];      
+        $encounterID = $csvColumn[1];
+        $formid = 21; // Laboratory Order and Result Form (Need Verification)
+        $encounterTypeID = 11;
+        $locationid = $_POST['locationid']; 
+        $encounterdate = date("Y-m-d", strtotime($csvColumn[5]));
+        $voided = 0;
+        $visitid = $csvColumn[1]; 
+        $patientid = $csvColumn[2];      
     }elseif($data_category=="Demographics"){
-        $encounterID = $csvColumn[0];
-        $formid = 21; // HIV Enrollment Form (Need Verification)
+        $encounterID = $csvColumn[0]+$_SESSION['maxvisit'];
+        $formid = 23; // HIV Enrollment Form (Need Verification)
         $encounterTypeID = 14;
-        $locationid = $csvColumn[1];
-        $encounterdate = date("Y-m-d", strtotime($csvColumn[26]));
+        $locationid = $_POST['locationid'];
+        $encounterdate = date("Y-m-d", strtotime($csvColumn[5]));
         $voided = $csvColumn[22];
-        $visitid = $csvColumn[0];
+        $visitid = $csvColumn[0]+$_SESSION['maxvisit'];
         $patientid = $csvColumn[0];
     }elseif($data_category=="Pharmacy"){
-        $encounterID = $csvColumn[28];
-        $formid = 25; // Pharmacy Order Form (Need Verification)
-        $encounterTypeID = 5;
-        $locationid = $csvColumn[1];
-        $encounterdate = date("Y-m-d", strtotime($csvColumn[26]));
-        $voided = $csvColumn[22];
-        $visitid = $csvColumn[0];
-        $patientid = $csvColumn[0];
+        $encounterID = $csvColumn[2];
+        $formid = 27; // Pharmacy Order Form (Need Verification)
+        $encounterTypeID = 13;
+        $locationid = $_POST['locationid'];
+        $encounterdate = date("Y-m-d", strtotime($csvColumn[5]));
+        $voided = 0;
+        $visitid = $csvColumn[2];
+        $patientid = $csvColumn[1];
     }else{ // Clinicals
         $encounterID = $csvColumn[2];
-        $formid = 12; // Care card form / Clinicals Encounter // (Need Verification)
-        $encounterTypeID = 5;
-        $locationid = $csvColumn[1];
-        $encounterdate = date("Y-m-d", strtotime($csvColumn[12]));
+        $formid = 14; // Care card form / Clinicals Encounter // (Need Verification)
+        $encounterTypeID = 12;
+        $locationid = $_POST['locationid'];
+        $encounterdate = date("Y-m-d", strtotime($csvColumn[26]));
         $voided = 0;
         $visitid = $csvColumn[2];
         $patientid = $csvColumn[0];

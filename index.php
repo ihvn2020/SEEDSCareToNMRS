@@ -1,4 +1,8 @@
-<?php require 'controllers/mainController.php';  ?>
+<?php
+session_start();
+$_SESSION['maxvisit']=1000000;
+?>
+<?php require 'controllers/mainController.php'; ?>
 <!DOCTYPE html>
 <html lang="">
     <head>
@@ -9,6 +13,7 @@
 
         <!-- Bootstrap CSS -->
         <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+        <link href="assets/css/loader.css" rel="stylesheet">
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -19,7 +24,7 @@
     </head>
     <body>
     
-       <nav class="navbar navbar-expand-md navbar-light bg-light">
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
            <a class="navbar-brand" href="#">SEEDCARE2NMRS</a>
            <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
                aria-expanded="false" aria-label="Toggle navigation">
@@ -27,17 +32,17 @@
            </button>
            <div class="collapse navbar-collapse" id="collapsibleNavId">
                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                   <li class="nav-item active">
-                       <a class="nav-link" href="#">MIGRATE <span class="sr-only">(current)</span></a>
+                   <li class="nav-item">
+                       <a class="nav-link active" href="index.php">MIGRATE <span class="sr-only">(current)</span></a>
                    </li>
                    <li class="nav-item">
-                       <a class="nav-link" href="#">SUPPORT</a>
+                       <a class="nav-link" href="support.php">SUPPORT</a>
                    </li>
                    <li class="nav-item dropdown">
                        <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">HOW TO</a>
                        <div class="dropdown-menu" aria-labelledby="dropdownId">
-                           <a class="dropdown-item" href="#">SET UP THE MIGRATOR</a>
-                           <a class="dropdown-item" href="#">MIGRATE TO NMRS</a>
+                           <a class="dropdown-item" href="setup.php">SET UP THE MIGRATOR</a>
+                           <a class="dropdown-item" href="migrate.php">MIGRATE TO NMRS</a>
                        </div>
                    </li>
                </ul>
@@ -58,7 +63,7 @@
                <br>
                    <h5 class="card-title">SETUP NMRS CONNECTION</h5><hr>
                    <p class="card-text">Connection Settings</p>
-              
+                  
                    <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" id="nmrsConnectForm">
                     
                    <div class="row">
@@ -92,6 +97,7 @@
                                 <input id="port_no" class="form-control" type="number" name="port_no" value="3316">
                             </div>
                        </div>
+                       
                        <div class="col-md-6">
                             <div class="form-group">
                             <?php
@@ -132,13 +138,15 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="data_category">Select Data Category</label>
+                                            <label for="data_category">Select Data Category <small class="alert-warning">(&#9432; Upload Demographics Data First!)</small></label>
                                             <select name="data_category" id="data_category" class="form-control">
                                                 <option value="">Please Select Data Type</option>
                                                 <option value="Demographics">Demographics Data</option>
                                                 <option value="Clinicals">Clinical Data</option>
                                                 <option value="Pharmacy">Pharmacy Data</option>
                                                 <option value="Lab">Laboratory Data</option>
+                                                <option value="Inactive">Inactive</option>
+                                                <option value="Termination">Termination and Tracking</option>
                                                 <option value="Users">Users Data</option>
                                             </select>
                                         </div>                            
@@ -147,10 +155,39 @@
 
                                 <div class="input-row">
                                     <div class="form-group">
-                                        <label class="col-md-12 control-label">Upload CSV File</label>
+                                        <label class="col-md-12 control-label">Upload CSV File</label> 
                                         <input type="file" name="file" id="file" accept=".csv">
                                     </div>
                                 </div>
+                                
+                                
+                                    <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="oldlocation">Current Location ID <small>(In NMRS)</small> </label>
+                                                    <input id="oldlocation" class="form-control" type="text" name="oldlocation" value="8">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="locationid">New Location ID</label>
+                                                        
+                                                    <select name="locationid" id="locationid" class="form-control">
+                                                    <?php    
+                                                        // Create a new Instance of the main Class seecareToNMRS                        
+                                                        $getLocations = new seedcareToNMRS();
+                                                        // Call the database checking function
+                                                        $getLocations->getLocations(); 
+                                                        
+                                                    ?>
+                                                    </select>
+                                                    
+                                                   </div>
+                                            </div>
+                                    </div>
+                                 
+                                
 
                                 <div class="input-row">
                                     <div class="form-group">
@@ -190,5 +227,17 @@
         <script src="assets/js/jquery-3.4.1.min.js"></script>
         <!-- Bootstrap JavaScript -->
         <script src="assets/js/bootstrap.min.js"></script>
+        <script>
+            $('body').append('<div style="color: white; text-align: center; font-size:1.5em;" id="loadingDiv"><div class="loader"></div>Please Wait...<br>Processing File</div>');
+            $(window).on('load', function(){
+                setTimeout(removeLoader, 2000); //wait for page load PLUS two seconds.
+            });
+            function removeLoader(){
+                $( "#loadingDiv" ).fadeOut(500, function() {
+                    // fadeOut complete. Remove the loading div
+                    $( "#loadingDiv" ).remove(); //makes page more lightweight 
+                });  
+            }
+        </script>
     </body>
 </html>

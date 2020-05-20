@@ -10,7 +10,6 @@ function nmrspatientFields(){
         'date_changed', // UpdateDate
         'voided', // Delete Flag
         'voided_by', // UserID
-        'void_reason', // Null
         'allergy_status' // 
     );
 
@@ -28,7 +27,6 @@ function seedcarepatientFields($csvColumn){
         "'".date("Y-m-d", strtotime($csvColumn[25]))."'",        
         $csvColumn[22], // Delete Flag
         $csvColumn[23], // UserID
-        $csvColumn[21], // Notes
         "'".$csvColumn[18]."'" // Status
     );
 

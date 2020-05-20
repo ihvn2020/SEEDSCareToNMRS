@@ -18,14 +18,22 @@ function nmrsperson_addressFields(){
         
 }
 
+function filterAddress($address){
+    if (!strpos($address, "'") !== false) {
+        return $address;
+    }else{
+        return str_replace("'","\'",$address);
+    }
+}
+
 //Column Names in Seed Care
 function seedcareperson_addressFields($csvColumn){
     $seedcareperson_addressColumns = array(
         $csvColumn[0], // Ptn_Pk
         $csvColumn[0], // Ptn_Pk
-        $csvColumn[35], // Address
-        "'".$csvColumn[9]." ".$csvColumn[10]." ".$csvColumn[11]."'", // VillageName
-        $csvColumn[12], // Province
+        "'".filterAddress($csvColumn[35])."'", // Address
+        "'".filterAddress($csvColumn[9]." ".$csvColumn[10]." ".$csvColumn[11])."'", // VillageName
+        "'".$csvColumn[12]."'", // Province
         $csvColumn[27], // CountryId
         $csvColumn[22], // DeleteFlag
         1, // $csvColumn[23], // Supposed to be userID but is null

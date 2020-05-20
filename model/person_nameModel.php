@@ -18,14 +18,30 @@ function nmrsperson_nameFields(){
         
 }
 
+function noNull($middlename){
+    if($middlename=='NULL'){
+        return '';
+    }else{
+        return $middlename;
+    }
+}
+
+function filterName($name){
+    if (!strpos($name, "'") !== false) {
+        return $name;
+    }else{
+        return str_replace("'","\'",$name);
+    }
+}
+
 //Column Names in Seed Care
 function seedcareperson_nameFields($csvColumn){
     $seedcareperson_nameColumns = array(
         $csvColumn[0], // Ptn_Pk
         $csvColumn[0],
-        "'".$csvColumn[33]."'", // Firstname
-        "'".$csvColumn[30]."'", // Middlename
-        "'".$csvColumn[34]."'", // Lastname
+        "'".filterName($csvColumn[33])."'", // Firstname
+        "'".filterName(noNull($csvColumn[30]))."'", // Middlename
+        "'".filterName($csvColumn[34])."'", // Lastname
         "'".date("Y-m-d", strtotime($csvColumn[24]))."'",
         $csvColumn[22], // DeleteFlag        
         1, // $csvColumn[23], // Supposed to be userID but is null

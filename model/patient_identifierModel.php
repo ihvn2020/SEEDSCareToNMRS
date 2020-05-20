@@ -41,7 +41,7 @@ function seedcarepatient_identifierFields($csvColumn,$identifier){
         $csvColumn[0], //$Patient Name, // UserID We use one for now because the demographics table has no creator value
         "'".getIdentifier($identifier,$csvColumn)."'", // Get Identifyier Name (later)
         $identifier, // Id Type
-        $csvColumn[1], // Location ID
+        $_POST['locationid'], // Location ID
         1,
         $csvColumn[22], // Delete Flag
         "'".bin2hex(random_bytes(6))."'"      

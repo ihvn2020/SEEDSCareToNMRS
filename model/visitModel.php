@@ -1,8 +1,4 @@
 <?php
-
-
-
-
 // Column names in NMRS Patient Table
 function nmrsvisitFields(){
     $nmrsvisitColumns = array(
@@ -25,31 +21,31 @@ function nmrsvisitFields(){
 //Column Names in Seed Care
 function seedcarevisitFields($csvColumn,$data_category){
     if($data_category=='Lab'){
-        $visitid = $csvColumn[0];  
+        $visitid = $csvColumn[1];  
         $datestarted = $csvColumn[5];
         $datestopped = $csvColumn[9]; 
-        $locationid = $csvColumn[3];   
-        $patientid = $csvColumn[1];
-        $voided = $csvColumn[22];
+        $locationid = $_POST['locationid'];   
+        $patientid = $csvColumn[2];
+        $voided = 0;
     }elseif($data_category=="Demographics"){
-        $visitid = $csvColumn[0];  
-        $datestarted = $csvColumn[26];
-        $datestopped = $csvColumn[26];
-        $locationid = $csvColumn[1];    
+        $visitid = $csvColumn[0]+$_SESSION['maxvisit'];  
+        $datestarted = $csvColumn[5];
+        $datestopped = $csvColumn[5];
+        $locationid = $_POST['locationid'];    
         $patientid = $csvColumn[0];   
         $voided = $csvColumn[22];
     }elseif($data_category=="Pharmacy"){
         $visitid = $csvColumn[2];  
         $datestarted = $csvColumn[5];
         $datestopped = $csvColumn[7];    
-        $locationid = $csvColumn[3];  
-        $patientid = $csvColumn[0]; 
-        $voided = $csvColumn[22];
+        $locationid = $_POST['locationid'];  
+        $patientid = $csvColumn[1]; 
+        $voided = 0;
     }else{
         $visitid = $csvColumn[2];
-        $datestarted = $csvColumn[12];
-        $datestopped = $csvColumn[12]; 
-        $locationid = $csvColumn[1];
+        $datestarted = $csvColumn[26];
+        $datestopped = $csvColumn[26]; 
+        $locationid = $_POST['locationid'];
         $patientid = $csvColumn[0]; 
         $voided = 0;
     }

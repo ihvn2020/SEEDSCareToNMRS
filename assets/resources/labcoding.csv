@@ -1,38 +1,51 @@
-LABTEST_ID,LABTESTCATEGORY_ID,DESCRIPTION,MEASUREAB,MEASUREPC,OPENMRSABSOLUTECONCEPTID,OPENMRSPCCONCEPTID,POSITIVE,NEGATIVE,DATATYPE
-1,4,CD4,cells/ul,%,5497,730,,,value_numeric
-2,2,WBC,x10^9 c/l,,678,,,,value_numeric
-3,2,Lymphocytes,/mm3,%,1319,1338,,,value_numeric
-4,2,Monocytes,/mm3,%,1023,1339,,,value_numeric
-5,2,Polymorphs,/mm3,%,1022,165919,,,value_numeric
-6,2,Eosinophils,/mm3,%,1024,1340,,,value_numeric
-7,2,Basophils,/mm3,%,1025,1341,,,value_numeric
-8,2,Haemoglobin (HB),g/dl,,165920,,,,value_numeric
-9,2,PCV,,%,165395,,,,value_numeric
-10,2,Platelets,x10^9 c/l,,729,,,,value_numeric
-11,1,K+,umol/l,,1133,,,,value_numeric
-12,1,Creatinine,umol/l,,164364,,,,value_numeric
-13,1,GLUCOSE,mmol/l,,160053,,,,value_numeric
-14,1,AST/SGOT,u/l,,653,,,,value_numeric
-15,1,ALT/SGPT,u/l,,165923,,,,value_numeric
-16,4,Viral Load,copies/ml,,856,,,,value_numeric
-17,1,Na+,mmol/l,,1132,,,,value_numeric
-18,1,Cl-,mmol/l,,1134,,,,value_numeric
-19,1,HCO3,mmol/l,,1135,,,,value_numeric
-20,1,BUN,mmol/l,,857,,,,value_numeric
-21,1,Total Bilirubin,umol/l,,655,,,,value_numeric
-22,1,Amylase,u/l,,1299,,,,value_numeric
-23,1,Total Cholesterol,mmol/l,,1006,,,,value_numeric
-24,1,LDL,mmol/l,,1008,,,,value_numeric
-25,1,HDL,mmol/l,,1007,,,,value_numeric
-26,1,Triglyceride,mmol/l,,1009,,,,value_numeric
-27,1,HBsAg,+/-,,159430,,703,664,value_coded
-28,1,Pregnancy,+/-,,45,,703,664,value_coded
-29,1,Malaria Parasite,+/-,,32,,703,664,value_coded
-30,3,VIA/Pap Smear,+/-,,165746,,,,value_numeric
-31,1,Fasting Glucose (FBS),mmol/l,,160053,,,,value_numeric
-32,4,VDRL,+/-,,299,,1228,1229,value_coded
-33,1,Alk. Phosphatase,u/l,,785,,,,value_numeric
-34,3,PROTEIN,g/dl,,165926,,,,value_numeric
-35,3,Sputum Smear,+/-,,165968,,703,664,value_coded
-36,1,HCV,+/-,,1325,,703,664,value_coded
-37,3,Stool microscopy,+/-,,304,,703,664,value_coded
+Seedscare Test Name,NMRS Name,NMRS Concept ID,DATATYPE,SEEDCARE ANSWER,NMRS Ans CODE
+ALT/SGPT,SERUM GLUTAMIC-PYRUVIC TRANSAMINASE,654,value_numeric,,
+Amylase,Amylase,1299,value_numeric,,
+AST/SGOT,SERUM GLUTAMIC-OXALOACETIC TRANSAMINASE,653,value_numeric,,
+CD4,CD4 COUNT,5497,value_numeric,,
+CD4 Percent,CD4%,730,value_numeric,,
+Cell Count Lymphocytes,LYMPHOCYTES,1021,value_numeric,,
+Cell Count Neutrophils,NEUTROPHILS,1022,value_numeric,,
+Cell Count RBCs,RBCS,682,value_numeric,,
+Cell Count WBCs,WBCS,677,value_numeric,,
+Creatinine,Serum creatinine (mg/dL),164364,value_numeric,,
+CSF Biochemistry - Glucose,Cerebrospinal fluid glucose,159647,value_numeric,,
+ESR,ESR,855,value_numeric,,
+Hb,Hemoglobin,21,value_numeric,,
+HCT,HEMATOCRIT,1015,value_numeric,,
+HIV Confirm,HIV Confirmation test,165513,value_coded,,
+HIV Confirm,HIV Confirmation test,165513,value_coded,1,703
+HIV Confirm,HIV Confirmation test,165513,value_coded,0,664
+HIV Rapid Test,Rapid test for HIV,163722,value_coded,,
+HIV Rapid Test,Rapid test for HIV,163722,value_coded,1,703
+HIV Rapid Test,Rapid test for HIV,163722,value_coded,0,664
+Malaria,MALARIA,161426,value_numeric,,
+Platelets,Platelets count,159487,value_numeric,,
+Pregnancy,URINE PREGNANCY TEST,45,value_coded,,
+Pregnancy,URINE PREGNANCY TEST,45,value_coded,1,703
+Pregnancy,URINE PREGNANCY TEST,45,value_coded,0,664
+Sputum AFB2,Sputum AFB,165968,value_coded,,
+Sputum AFB2,Sputum AFB,165968,value_coded,1,703
+Sputum AFB2,Sputum AFB,165968,value_coded,0,664
+Syphilis (RPR),RAPID PLASMA REAGIN,1619,value_coded,,
+Syphilis (RPR),RAPID PLASMA REAGIN,1619,value_coded,1,703
+Syphilis (RPR),RAPID PLASMA REAGIN,1619,value_coded,0,664
+Urinalysis - Glucose,"glucose measurement, qualitative, urine",159734,value_numeric,,
+Urinalysis - Ketone,Urine Ketones Test,161442,value_coded,,
+Urinalysis - Ketone,Urine Ketones Test,161442,value_coded,42.1,1365
+Urinalysis Microscopic Bacteria,,,value_numeric,,
+Urinalysis Microscopic Blood,,,value_numeric,,
+Urinalysis Microscopic Casts,,,value_numeric,,
+Urinalysis Microscopic WBC,,,value_numeric,,
+Viral Load,HIV VIRAL LOAD,856,value_numeric,,
+ViralLoad Undetectable,HIV VIRAL LOAD,856,value_numeric,,
+WBC,WHITE BLOOD CELLS,678,value_numeric,,
+WBC Diff - Eosin%,EOSINOPHILS (%) - MICROSCOPIC EXAM,1340,value_numeric,,
+WBC Diff - Lymph,LYMPHOCYTE COUNT,1319,value_numeric,,
+WBC Diff - Lymph%,LYMPHOCYTES (%) - MICROSCOPIC EXAM,1336,value_numeric,,
+WBC Diff - Mono%,MONOCYTES (%) - MICROSCOPIC EXAM,1339,value_numeric,,
+WBC Diff - Neut,NEUTROPHILS,1022,value_numeric,,
+WBC Diff - Neut%,NEUTROPHILS (%) - MICROSCOPIC EXAM,1336,value_numeric,,
+WBC Diff - Eosin,EOSINOPHILS,1024,value_numeric,,
+WBC Diff - Mono,MONOCYTES,1023,value_numeric,,
+RBC,RED BLOOD CELLS,679,value_numeric,"",""
