@@ -356,7 +356,7 @@ function getAgeGroup($csvColumn){
 function getRegimenLine($csvColumn){
     switch(getAgeGroup($csvColumn)){
         case 1528: // Child
-            if(substr($csvColumn[18], -2)=='/r'){
+            if(substr($csvColumn[18], -2)=='/r' || substr($csvColumn[18], -2)=='-r'){
                 return 164514; // Child Second Line
             }else{
                 return 164507; // Child First Line
@@ -364,7 +364,7 @@ function getRegimenLine($csvColumn){
         break;
 
         case 165709: // Adult
-            if(substr($csvColumn[18], -2)=='/r'){
+            if(substr($csvColumn[18], -2)=='/r'  || substr($csvColumn[18], -2)=='-r'){
                 return 164513; // Adult Second Line
             }else{
                 return 164506; // Adult First Line

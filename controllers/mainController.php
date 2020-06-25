@@ -750,7 +750,9 @@ class seedcareToNMRS extends clinicalDictionary{
 							foreach ( $vfile as $content ) {
 								$firstVisit[] = array_filter(array_map("trim", explode(",", $content)));
 							}
-							
+							// mysqli_query($conn,"DELETE FROM obs WHERE form_namespace_and_path='Pharmacy Form'") or die(mysqli_error($conn));
+
+													
 							$pharmacyTables = array('encounter','visit','obs');
 							// $pharmacyTables = array('obs');								
 							foreach ($pharmacyTables as $key => $phtable) {
@@ -805,8 +807,7 @@ class seedcareToNMRS extends clinicalDictionary{
 													$obsrowc = 1;
 													
 													if(array_search($csvColumn[2],$visitArray)!==FALSE){}else{
-														foreach($obsrows as $obsrow){
-															
+														foreach($obsrows as $obsrow){														
 																
 																if($obsrow['conceptAns']!=""){
 																	$answer = $obsrow['conceptAns'];
@@ -1329,6 +1330,7 @@ class seedcareToNMRS extends clinicalDictionary{
 						break;
 
 						case 'Inactive':
+									// mysqli_query($conn,"DELETE FROM obs WHERE form_namespace_and_path='Client Tracking and Termination'") or die(mysqli_error($conn));
 									mysqli_options($conn, MYSQLI_OPT_LOCAL_INFILE, true);
 									$phtable = 'obs';
 									$all_values = ""; // SQL values container
